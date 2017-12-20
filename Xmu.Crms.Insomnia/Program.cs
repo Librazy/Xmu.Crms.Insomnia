@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
@@ -16,13 +17,7 @@ namespace Xmu.Crms.Insomnia
     {
         public static async Task Main(string[] args)
         {
-            Startup.ControllerAssembly.Add(Assembly.GetEntryAssembly());
-            Startup.ControllerAssembly.Add(Assembly.GetAssembly(typeof(Web.Insomnia.Program)));
-
-            Startup.ConfigureCrmsServices += collection => collection.AddInsomniaUserService().AddInsomniaTimerService();
-
             var host = BuildWebHost(args);
-
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -87,6 +82,10 @@ namespace Xmu.Crms.Insomnia
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseIISIntegration()
+                .ConfigureServices(collection =>
+                {
+                    collection.AddInsomniaUserService().AddInsomniaTimerService().AddCrmsView("Web.Insomnia");
+                })
                 .UseStartup<Startup>()
                 .Build();
     }

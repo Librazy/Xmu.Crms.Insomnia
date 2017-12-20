@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -49,29 +48,47 @@ namespace Xmu.Crms.Insomnia
                     {
                         Avatar = "/upload/avatar/Logo_Li.png",
                         Email = "t@t.test",
-                        Gender = 0,
+                        Gender = Gender.Male,
                         Name = "张三",
                         Number = "123456",
                         Password = PasswordUtils.HashString("123"),
                         Phone = "1234",
                         School = await db.School.FindAsync(school.Entity.Id),
-                        Title = 1
+                        Title = ""
                     });
 
                     await db.UserInfo.AddAsync(new UserInfo
                     {
                         Avatar = "/upload/avatar/Logo_Li.png",
                         Email = "t2@t.test",
-                        Gender = 1,
+                        Gender = Gender.Female,
                         Name = "李四",
                         Number = "134254",
                         Password = PasswordUtils.HashString("456"),
                         Phone = "123",
                         School = await db.School.FindAsync(school.Entity.Id),
-                        Title = 1
+                        Title = ""
                     });
 
                     await db.SaveChangesAsync();
+                }
+
+                if (Convert.ToBoolean(conf["Database:Check"]))
+                {
+                    Debug.WriteLine(await db.Attendences.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.ClassInfo.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.Course.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.CourseSelection.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.FixGroup.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.FixGroupMember.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.Location.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.Seminar.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.SeminarGroup.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.SeminarGroupMember.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.SeminarGroupTopic.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.StudentScoreGroup.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.Topic.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 1));
                 }
             }
 

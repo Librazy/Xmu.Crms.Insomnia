@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Xmu.Crms.Shared.Models;
 
-namespace CourseManagementSystem.Group1
+namespace Xmu.Crms.Insomnia
 {
     [Route("")]
     [Produces("application/json")]

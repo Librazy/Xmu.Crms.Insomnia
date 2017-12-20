@@ -6,20 +6,20 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Xmu.Crms.Services.Group1;
+using Xmu.Crms.Services.Insomnia;
 using Xmu.Crms.Shared;
 using Xmu.Crms.Shared.Models;
 
-namespace CourseManagementSystem.Group1
+namespace Xmu.Crms.Insomnia
 {
     public class Program
     {
         public static async Task Main(string[] args)
         {
             Startup.ControllerAssembly.Add(Assembly.GetEntryAssembly());
-            Startup.ControllerAssembly.Add(Assembly.GetAssembly(typeof(Xmu.Crms.Web.Group1.Program)));
+            Startup.ControllerAssembly.Add(Assembly.GetAssembly(typeof(Web.Insomnia.Program)));
 
-            Startup.ConfigureCrmsServices += collection => collection.AddGroup1UserService();
+            Startup.ConfigureCrmsServices += collection => collection.AddInsomniaUserService().AddInsomniaTimerService();
 
             var host = BuildWebHost(args);
 
@@ -41,7 +41,7 @@ namespace CourseManagementSystem.Group1
 
                 if (Convert.ToBoolean(conf["Database:InsertStub"]))
                 {
-                    var school = await db.Schools.AddAsync(new School
+                    var school = await db.School.AddAsync(new School
                     {
                         City = "厦门",
                         Name = "厦门市人民公园",
@@ -50,7 +50,7 @@ namespace CourseManagementSystem.Group1
 
                     await db.SaveChangesAsync();
 
-                    await db.UserInfos.AddAsync(new UserInfo
+                    await db.UserInfo.AddAsync(new UserInfo
                     {
                         Avatar = "/upload/avatar/Logo_Li.png",
                         Email = "t@t.test",
@@ -59,11 +59,11 @@ namespace CourseManagementSystem.Group1
                         Number = "123456",
                         Password = PasswordUtils.HashString("123"),
                         Phone = "1234",
-                        School = await db.Schools.FindAsync(school.Entity.Id),
+                        School = await db.School.FindAsync(school.Entity.Id),
                         Title = 1
                     });
 
-                    await db.UserInfos.AddAsync(new UserInfo
+                    await db.UserInfo.AddAsync(new UserInfo
                     {
                         Avatar = "/upload/avatar/Logo_Li.png",
                         Email = "t2@t.test",
@@ -72,7 +72,7 @@ namespace CourseManagementSystem.Group1
                         Number = "134254",
                         Password = PasswordUtils.HashString("456"),
                         Phone = "123",
-                        School = await db.Schools.FindAsync(school.Entity.Id),
+                        School = await db.School.FindAsync(school.Entity.Id),
                         Title = 1
                     });
 

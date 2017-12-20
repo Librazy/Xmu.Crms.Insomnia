@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
-namespace CourseManagementSystem.Group1
+namespace Xmu.Crms.Insomnia
 {
     public static class Utils
     {

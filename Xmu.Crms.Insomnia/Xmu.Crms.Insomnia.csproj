@@ -18,9 +18,9 @@
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
-    <ProjectReference Include="..\Xmu.Crms.Services.Group1\Xmu.Crms.Services.Group1.csproj" />
+    <ProjectReference Include="..\Xmu.Crms.Services.Insomnia\Xmu.Crms.Services.Insomnia.csproj" />
     <ProjectReference Include="..\Xmu.Crms.Shared\Xmu.Crms.Shared.csproj" />
-    <ProjectReference Include="..\Xmu.Crms.Web.Group1\Xmu.Crms.Web.Group1.csproj" />
+    <ProjectReference Include="..\Xmu.Crms.Web.Insomnia\Xmu.Crms.Web.Insomnia.csproj" />
     <PackageReference Update="Microsoft.NETCore.App" Version="2.0.3" />
   </ItemGroup>
   

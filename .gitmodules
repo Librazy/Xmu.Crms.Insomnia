@@ -1,9 +1,12 @@
 [submodule "Xmu.Crms.Shared"]
 	path = Xmu.Crms.Shared
 	url = git@github.com:Librazy/Xmu.Crms.Shared.git
+	branch = master
 [submodule "Xmu.Crms.Services.Insomnia"]
 	path = Xmu.Crms.Services.Insomnia
 	url = git@github.com:Librazy/Xmu.Crms.Services.Insomnia.git
+	branch = master
 [submodule "Xmu.Crms.Web.Insomnia"]
 	path = Xmu.Crms.Web.Insomnia
 	url = git@github.com:Librazy/Xmu.Crms.Web.Insomnia.git
+	branch = master

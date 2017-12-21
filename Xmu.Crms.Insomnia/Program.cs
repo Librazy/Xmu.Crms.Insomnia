@@ -101,7 +101,7 @@ namespace Xmu.Crms.Insomnia
                 .UseIISIntegration()
                 .ConfigureServices(collection =>
                 {
-                    collection.AddInsomniaUserService().AddInsomniaTimerService().AddCrmsView("Web.Insomnia");
+                    collection.AddInsomniaUserService().AddInsomniaTimerService().AddCrmsView("API.Insomnia").AddCrmsView("Web.Insomnia");
                 })
                 .UseStartup<Startup>()
                 .Build();

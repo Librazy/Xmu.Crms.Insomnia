@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Xmu.Crms.Services.Insomnia;
 using Xmu.Crms.Shared;
 using Xmu.Crms.Shared.Models;
@@ -54,7 +55,7 @@ namespace Xmu.Crms.Insomnia
                         Password = PasswordUtils.HashString("123"),
                         Phone = "1234",
                         School = await db.School.FindAsync(school.Entity.Id),
-                        Title = ""
+                        Title = Title.Other
                     });
 
                     await db.UserInfo.AddAsync(new UserInfo
@@ -67,7 +68,7 @@ namespace Xmu.Crms.Insomnia
                         Password = PasswordUtils.HashString("456"),
                         Phone = "123",
                         School = await db.School.FindAsync(school.Entity.Id),
-                        Title = ""
+                        Title = Title.Professer
                     });
 
                     await db.SaveChangesAsync();
@@ -88,7 +89,8 @@ namespace Xmu.Crms.Insomnia
                     Debug.WriteLine(await db.SeminarGroupTopic.SingleOrDefaultAsync(a => a.Id == 1));
                     Debug.WriteLine(await db.StudentScoreGroup.SingleOrDefaultAsync(a => a.Id == 1));
                     Debug.WriteLine(await db.Topic.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 1));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 1)));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 3)));
                 }
             }
 
@@ -101,7 +103,7 @@ namespace Xmu.Crms.Insomnia
                 .UseIISIntegration()
                 .ConfigureServices(collection =>
                 {
-                    collection.AddInsomniaUserService().AddInsomniaTimerService().AddCrmsView("API.Insomnia").AddCrmsView("Web.Insomnia");
+                    collection.AddInsomniaSeminarGroupService().AddInsomniaFixedGroupService().AddCrmsView("API.Insomnia").AddCrmsView("Web.Insomnia");
                 })
                 .UseStartup<Startup>()
                 .Build();

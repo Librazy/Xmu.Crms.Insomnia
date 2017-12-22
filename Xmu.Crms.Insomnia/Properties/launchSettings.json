@@ -15,7 +15,11 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "ClassManagementSystem_Controllers": {
+    "IIS Express Production": {
+      "commandName": "IISExpress",
+      "launchBrowser": true
+    },
+    "ClassManagementSystem": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

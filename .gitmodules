@@ -10,3 +10,7 @@
 	path = Xmu.Crms.Web.Insomnia
 	url = git@github.com:Librazy/Xmu.Crms.Web.Insomnia.git
 	branch = master
+[submodule "Xmu.Crms.API.Insomnia"]
+	path = Xmu.Crms.API.Insomnia
+	url = git@github.com:Librazy/Xmu.Crms.API.Insomnia.git
+	branch = master

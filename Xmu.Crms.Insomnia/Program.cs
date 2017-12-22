@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Xmu.Crms.Services.Insomnia;
 using Xmu.Crms.Shared;
 using Xmu.Crms.Shared.Models;
@@ -76,21 +77,23 @@ namespace Xmu.Crms.Insomnia
 
                 if (Convert.ToBoolean(conf["Database:Check"]))
                 {
-                    Debug.WriteLine(await db.Attendences.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.ClassInfo.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.Course.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.CourseSelection.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.FixGroup.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.FixGroupMember.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.Location.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.Seminar.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.SeminarGroup.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.SeminarGroupMember.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.SeminarGroupTopic.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.StudentScoreGroup.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(await db.Topic.SingleOrDefaultAsync(a => a.Id == 1));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 1)));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 3)));
+                    var checkSetting = new JsonSerializerSettings();
+                    checkSetting.Converters.Add(new StringEnumConverter());
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Attendences.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.ClassInfo.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Course.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.CourseSelection.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.FixGroup.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.FixGroupMember.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Location.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Seminar.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.SeminarGroup.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.SeminarGroupMember.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.SeminarGroupTopic.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.StudentScoreGroup.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Topic.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 3), checkSetting));
                 }
             }
 

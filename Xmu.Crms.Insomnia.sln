@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Insomnia", "Xmu.Cr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.API.Insomnia", "Xmu.Crms.API.Insomnia\Xmu.Crms.API.Insomnia.csproj", "{C946F715-3E86-4EC9-8F69-6D13F60705CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xmu.Crms.Insomnia.XUnitTest", "Xmu.Crms.Insomnia.XUnitTest\Xmu.Crms.Insomnia.XUnitTest.csproj", "{9BD81195-3F44-491F-9DC6-FB481202A41F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{C946F715-3E86-4EC9-8F69-6D13F60705CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C946F715-3E86-4EC9-8F69-6D13F60705CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C946F715-3E86-4EC9-8F69-6D13F60705CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BD81195-3F44-491F-9DC6-FB481202A41F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BD81195-3F44-491F-9DC6-FB481202A41F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BD81195-3F44-491F-9DC6-FB481202A41F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BD81195-3F44-491F-9DC6-FB481202A41F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

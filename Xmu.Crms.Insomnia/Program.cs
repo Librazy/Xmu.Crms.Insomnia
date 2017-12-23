@@ -102,13 +102,23 @@ namespace Xmu.Crms.Insomnia
 
 
         public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+            CreateWebHostBuilder(args)
+                .Build();
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
                 .UseIISIntegration()
                 .ConfigureServices(collection =>
                 {
-                    collection.AddInsomniaSeminarGroupService().AddInsomniaFixedGroupService().AddCrmsView("API.Insomnia").AddCrmsView("Web.Insomnia");
+                    collection
+                        .AddInsomniaSeminarGroupService()
+                        .AddInsomniaFixedGroupService()
+                        .AddInsomniaLoginService()
+                        .AddCrmsView("API.Insomnia")
+                        .AddCrmsView("Web.Insomnia");
                 })
-                .UseStartup<Startup>()
-                .Build();
+                .UseStartup<Startup>();
+        }
     }
 }

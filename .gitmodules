@@ -14,3 +14,7 @@
 	path = Xmu.Crms.API.Insomnia
 	url = git@github.com:Librazy/Xmu.Crms.API.Insomnia.git
 	branch = master
+[submodule "Xmu.Crms.Insomnia.XUnitTest"]
+	path = Xmu.Crms.Insomnia.XUnitTest
+	url = git@github.com:Librazy/Xmu.Crms.Insomnia.XUnitTest
+	branch = master

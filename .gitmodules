@@ -18,3 +18,11 @@
 	path = Xmu.Crms.Insomnia.XUnitTest
 	url = git@github.com:Librazy/Xmu.Crms.Insomnia.XUnitTest
 	branch = master
+[submodule "Xmu.Crms.Services.ViceVersa"]
+	path = Xmu.Crms.Services.ViceVersa
+	url = git@github.com:Librazy/Xmu.Crms.Services.ViceVersa.git
+	branch = master
+[submodule "Xmu.Crms.Services.HighGrade"]
+	path = Xmu.Crms.Services.HighGrade
+	url = git@github.com:Librazy/Xmu.Crms.Services.HighGrade.git
+	branch = master

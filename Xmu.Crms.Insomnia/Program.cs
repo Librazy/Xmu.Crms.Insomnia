@@ -54,8 +54,21 @@ namespace Xmu.Crms.Insomnia
                         .AddInsomniaSeminarGroupService()
                         .AddInsomniaFixedGroupService()
                         .AddInsomniaLoginService()
+                        .AddInsomniaTopicService()
+                        .AddInsomniaUserService()
                         .AddCrmsView("API.Insomnia")
-                        .AddCrmsView("Web.Insomnia");
+                        .AddCrmsView("Web.Insomnia")
+
+                        .AddViceVersaClassDao()
+                        .AddViceVersaClassService()
+                        .AddViceVersaCourseDao()
+                        .AddViceVersaCourseService()
+                        .AddViceVersaGradeDao()
+                        .AddViceVersaGradeService()
+
+                        .AddHighGradeSchoolService()
+                        .AddHighGradeSeminarService()
+                        ;
                 })
                 .UseStartup<Startup>();
         }

@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Insomnia", "Xmu.Cr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.API.Insomnia", "Xmu.Crms.API.Insomnia\Xmu.Crms.API.Insomnia.csproj", "{C946F715-3E86-4EC9-8F69-6D13F60705CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xmu.Crms.Insomnia.XUnitTest", "Xmu.Crms.Insomnia.XUnitTest\Xmu.Crms.Insomnia.XUnitTest.csproj", "{9BD81195-3F44-491F-9DC6-FB481202A41F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Insomnia.XUnitTest", "Xmu.Crms.Insomnia.XUnitTest\Xmu.Crms.Insomnia.XUnitTest.csproj", "{9BD81195-3F44-491F-9DC6-FB481202A41F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Services.ViceVersa", "Xmu.Crms.Services.ViceVersa\Xmu.Crms.Services.ViceVersa.csproj", "{EDD04CFD-DD1B-4161-8983-22B33EC3CB3A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Services.HighGrade", "Xmu.Crms.Services.HighGrade\Xmu.Crms.Services.HighGrade.csproj", "{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,14 @@ Global
 		{9BD81195-3F44-491F-9DC6-FB481202A41F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BD81195-3F44-491F-9DC6-FB481202A41F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BD81195-3F44-491F-9DC6-FB481202A41F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDD04CFD-DD1B-4161-8983-22B33EC3CB3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDD04CFD-DD1B-4161-8983-22B33EC3CB3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDD04CFD-DD1B-4161-8983-22B33EC3CB3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDD04CFD-DD1B-4161-8983-22B33EC3CB3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

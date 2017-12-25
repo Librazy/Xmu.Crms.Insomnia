@@ -56,7 +56,8 @@ namespace Xmu.Crms.Insomnia
                         .AddInsomniaLoginService()
                         .AddInsomniaTopicService()
                         .AddInsomniaUserService()
-                        .AddCrmsView("API.Insomnia")
+                        .AddCrmsView("API.HighGrade")
+                        .AddCrmsView("Mobile.HighGrade")
                         .AddCrmsView("Web.Insomnia")
 
                         .AddViceVersaClassDao()

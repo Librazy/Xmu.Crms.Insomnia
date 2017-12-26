@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
-    <ProjectReference Include="..\Xmu.Crms.API.HighGrade\Xmu.Crms.API.HighGrade.csproj" />
     <ProjectReference Include="..\Xmu.Crms.API.Insomnia\Xmu.Crms.API.Insomnia.csproj" />
     <ProjectReference Include="..\Xmu.Crms.Mobile.HighGrade\Xmu.Crms.Mobile.HighGrade.csproj" />
     <ProjectReference Include="..\Xmu.Crms.Services.HighGrade\Xmu.Crms.Services.HighGrade.csproj" />

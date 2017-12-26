@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Services.ViceVersa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Services.HighGrade", "Xmu.Crms.Services.HighGrade\Xmu.Crms.Services.HighGrade.csproj", "{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.API.HighGrade", "Xmu.Crms.API.HighGrade\Xmu.Crms.API.HighGrade.csproj", "{FC301349-D5A6-4B3F-A9CF-E423C9B1A0E4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Mobile.HighGrade", "Xmu.Crms.Mobile.HighGrade\Xmu.Crms.Mobile.HighGrade.csproj", "{908B339A-EBD0-46AE-8F05-0449ED11C05E}"
 EndProject
 Global
@@ -61,10 +59,6 @@ Global
 		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FC301349-D5A6-4B3F-A9CF-E423C9B1A0E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FC301349-D5A6-4B3F-A9CF-E423C9B1A0E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FC301349-D5A6-4B3F-A9CF-E423C9B1A0E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FC301349-D5A6-4B3F-A9CF-E423C9B1A0E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{908B339A-EBD0-46AE-8F05-0449ED11C05E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{908B339A-EBD0-46AE-8F05-0449ED11C05E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{908B339A-EBD0-46AE-8F05-0449ED11C05E}.Release|Any CPU.ActiveCfg = Release|Any CPU

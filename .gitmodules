@@ -26,3 +26,7 @@
 	path = Xmu.Crms.Services.HighGrade
 	url = git@github.com:Librazy/Xmu.Crms.Services.HighGrade.git
 	branch = master
+[submodule "Xmu.Crms.Mobile.HighGrade"]
+	path = Xmu.Crms.Mobile.HighGrade
+	url = https://github.com/Young0518/Xmu.Crms.Mobile.HighGrade
+	branch = master

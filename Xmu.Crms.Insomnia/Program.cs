@@ -18,7 +18,7 @@ namespace Xmu.Crms.Insomnia
     {
         public static async Task Main(string[] args)
         {
-            var host = BuildWebHost(args);
+            var host = CreateWebHostBuilder(args).Build();
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -80,31 +80,45 @@ namespace Xmu.Crms.Insomnia
                     var checkSetting = new JsonSerializerSettings();
                     checkSetting.Converters.Add(new StringEnumConverter());
                     checkSetting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Attendences.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.ClassInfo.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Course.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.CourseSelection.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.FixGroup.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.FixGroupMember.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Location.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Seminar.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.SeminarGroup.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.SeminarGroupMember.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.SeminarGroupTopic.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.StudentScoreGroup.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Topic.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
-                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 3), checkSetting));
+                    Debug.WriteLine(
+                        JsonConvert.SerializeObject(await db.Attendences.SingleOrDefaultAsync(a => a.Id == 1),
+                            checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.ClassInfo.SingleOrDefaultAsync(a => a.Id == 1),
+                        checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Course.SingleOrDefaultAsync(a => a.Id == 1),
+                        checkSetting));
+                    Debug.WriteLine(
+                        JsonConvert.SerializeObject(await db.CourseSelection.SingleOrDefaultAsync(a => a.Id == 1),
+                            checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.FixGroup.SingleOrDefaultAsync(a => a.Id == 1),
+                        checkSetting));
+                    Debug.WriteLine(
+                        JsonConvert.SerializeObject(await db.FixGroupMember.SingleOrDefaultAsync(a => a.Id == 1),
+                            checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Location.SingleOrDefaultAsync(a => a.Id == 1),
+                        checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Seminar.SingleOrDefaultAsync(a => a.Id == 1),
+                        checkSetting));
+                    Debug.WriteLine(
+                        JsonConvert.SerializeObject(await db.SeminarGroup.SingleOrDefaultAsync(a => a.Id == 1),
+                            checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(
+                        await db.SeminarGroupMember.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(
+                        await db.SeminarGroupTopic.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(
+                        await db.StudentScoreGroup.SingleOrDefaultAsync(a => a.Id == 1), checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.Topic.SingleOrDefaultAsync(a => a.Id == 1),
+                        checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 1),
+                        checkSetting));
+                    Debug.WriteLine(JsonConvert.SerializeObject(await db.UserInfo.SingleOrDefaultAsync(a => a.Id == 3),
+                        checkSetting));
                 }
             }
 
             host.Run();
         }
-
-
-        public static IWebHost BuildWebHost(string[] args) =>
-            CreateWebHostBuilder(args)
-                .Build();
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
@@ -119,16 +133,12 @@ namespace Xmu.Crms.Insomnia
                         .AddInsomniaTopicService()
                         .AddInsomniaUserService()
                         .AddCrmsView("API.Insomnia")
-                        .AddCrmsView("Mobile.HighGrade")
-                        .AddCrmsView("Web.Insomnia")
-
                         .AddViceVersaClassDao()
                         .AddViceVersaClassService()
                         .AddViceVersaCourseDao()
                         .AddViceVersaCourseService()
                         .AddViceVersaGradeDao()
                         .AddViceVersaGradeService()
-
                         .AddHighGradeSchoolService()
                         .AddHighGradeSeminarService()
                         ;

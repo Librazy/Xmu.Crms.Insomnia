@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -15,14 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Xmu.Crms.API.Insomnia\Xmu.Crms.API.Insomnia.csproj" />
-    <ProjectReference Include="..\Xmu.Crms.Services.HighGrade\Xmu.Crms.Services.HighGrade.csproj" />
     <ProjectReference Include="..\Xmu.Crms.Services.Insomnia\Xmu.Crms.Services.Insomnia.csproj" />
-    <ProjectReference Include="..\Xmu.Crms.Services.ViceVersa\Xmu.Crms.Services.ViceVersa.csproj" />
     <ProjectReference Include="..\Xmu.Crms.Shared\Xmu.Crms.Shared.csproj" />
   </ItemGroup>
   
-  <Target Name="CopyDepsFiles" AfterTargets="Build" Condition="'$(TargetFramework)'!=''">
+    <Target Name="CopyDepsFiles" AfterTargets="Build" Condition="'$(TargetFramework)'!=''">
     <ItemGroup>
       <DepsFilePaths Include="$([System.IO.Path]::ChangeExtension('%(_ResolvedProjectReferencePaths.FullPath)', '.deps.json'))" />
     </ItemGroup>

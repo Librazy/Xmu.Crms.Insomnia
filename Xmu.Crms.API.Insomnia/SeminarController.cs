@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,11 +34,11 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/seminar/{seminarId:long}")]
-        public IActionResult GetSeminarById([FromRoute] long seminarId)
+        public async Task<IActionResult> GetSeminarById([FromRoute] long seminarId)
         {
             try
             {
-                var sem = _seminarService.GetSeminarBySeminarId(seminarId);
+                var sem = await _seminarService.GetSeminarBySeminarIdAsync(seminarId);
                 return Json(new
                 {
                     id = sem.Id,
@@ -67,7 +68,7 @@ namespace Xmu.Crms.Insomnia
 
             try
             {
-                _seminarService.UpdateSeminarBySeminarId(seminarId, updated);
+                _seminarService.UpdateSeminarBySeminarIdAsync(seminarId, updated);
                 return NoContent();
             }
             catch (SeminarNotFoundException)
@@ -81,7 +82,7 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpDelete("/seminar/{seminarId:long}")]
-        public IActionResult DeleteSeminarById([FromRoute] long seminarId)
+        public async Task<IActionResult> DeleteSeminarById([FromRoute] long seminarId)
         {
             if (User.Type() != Type.Teacher)
             {
@@ -90,7 +91,7 @@ namespace Xmu.Crms.Insomnia
 
             try
             {
-                _seminarService.DeleteSeminarBySeminarId(seminarId);
+                await _seminarService.DeleteSeminarBySeminarIdAsync(seminarId);
                 return NoContent();
             }
             catch (SeminarNotFoundException)
@@ -105,11 +106,11 @@ namespace Xmu.Crms.Insomnia
 
         //groupLeft未加
         [HttpGet("/seminar/{seminarId:long}/topic")]
-        public IActionResult GetTopicsBySeminarId([FromRoute] long seminarId)
+        public async Task<IActionResult> GetTopicsBySeminarId([FromRoute] long seminarId)
         {
             try
             {
-                var topics = _topicService.ListTopicBySeminarId(seminarId);
+                var topics = await _topicService.ListTopicBySeminarIdAsync(seminarId);
                 return Json(topics.Select(t => new
                 {
                     id = t.Id,
@@ -131,24 +132,24 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPost("/seminar/{seminarId:long}/topic")]
-        public IActionResult CreateTopicBySeminarId([FromRoute] long seminarId, [FromBody] Topic newTopic)
+        public async Task<IActionResult> CreateTopicBySeminarId([FromRoute] long seminarId, [FromBody] Topic newTopic)
         {
             if (User.Type() != Type.Teacher)
             {
                 return StatusCode(403, new {msg = "权限不足"});
             }
 
-            var topicid = _topicService.InsertTopicBySeminarId(seminarId, newTopic);
+            var topicid = await _topicService.InsertTopicBySeminarIdAsync(seminarId, newTopic);
             return Created("/topic/" + topicid, newTopic);
         }
 
         //没有小组成员 和 report
         [HttpGet("/seminar/{seminarId:long}/group")]
-        public IActionResult GetGroupsBySeminarId([FromRoute] long seminarId)
+        public async Task<IActionResult> GetGroupsBySeminarId([FromRoute] long seminarId)
         {
             try
             {
-                var groups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
+                var groups = await _seminargroupService.ListSeminarGroupBySeminarIdAsync(seminarId);
                 return Json(groups.Select(t => new
                 {
                     id = t.Id,
@@ -166,7 +167,7 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/seminar/{seminarId:long}/group/my")]
-        public IActionResult GetStudentGroupBySeminarId([FromRoute] long seminarId)
+        public async Task<IActionResult> GetStudentGroupBySeminarId([FromRoute] long seminarId)
         {
             if (User.Type() != Type.Student)
             {
@@ -175,15 +176,15 @@ namespace Xmu.Crms.Insomnia
 
             try
             {
-                var groups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
+                var groups = await _seminargroupService.ListSeminarGroupBySeminarIdAsync(seminarId);
                 var group = groups.SelectMany(grp => _db.Entry(grp).Collection(gp => gp.SeminarGroupMembers).Query()
                                     .Include(gm => gm.SeminarGroup)
                                     .Where(gm => gm.StudentId == User.Id()).Select(gm => gm.SeminarGroup))
                                 .SingleOrDefault(sg => sg.SeminarId == seminarId) ?? throw new GroupNotFoundException();
-                var leader = group.Leader ?? _userService.GetUserByUserId(group.LeaderId);
-                var members = _seminargroupService.ListSeminarGroupMemberByGroupId(group.Id);
-                var topics = _topicService.ListSeminarGroupTopicByGroupId(group.Id)
-                    .Select(gt => _topicService.GetTopicByTopicId(gt.TopicId));
+                var leader = group.Leader ?? await _userService.GetUserByUserIdAsync(group.LeaderId);
+                var members = await _seminargroupService.ListSeminarGroupMemberByGroupIdAsync(group.Id);
+                var topics = await Task.WhenAll((await _topicService.ListSeminarGroupTopicByGroupIdAsync(group.Id))
+                    .Select(gt => _topicService.GetTopicByTopicIdAsync(gt.TopicId)));
                 return Json(new
                 {
                     id = group.Id,

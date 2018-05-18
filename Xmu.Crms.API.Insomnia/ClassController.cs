@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/class")]
-        public IActionResult GetUserClasses([FromQuery] string courseName, [FromQuery] string courseTeacher)
+        public async Task<IActionResult> GetUserClasses([FromQuery] string courseName, [FromQuery] string courseTeacher)
         {
             //List<ClassInfo> classes = new List<ClassInfo>();
             try
@@ -44,35 +45,41 @@ namespace Xmu.Crms.Insomnia
                 IList<ClassInfo> classes;
                 if (string.IsNullOrEmpty(courseName) && string.IsNullOrEmpty(courseTeacher))
                 {
-                    classes = _classService.ListClassByUserId(User.Id());
+                    classes = await _classService.ListClassByUserIdAsync(User.Id());
                 }
                 else if (string.IsNullOrEmpty(courseTeacher))
                 {
-                    classes = _courseService.ListClassByCourseName(courseName);
+                    classes = await _courseService.ListClassByCourseNameAsync(courseName);
                 }
                 else if (string.IsNullOrEmpty(courseName))
                 {
-                    classes = _courseService.ListClassByTeacherName(courseTeacher);
+                    classes = await _courseService.ListClassByTeacherNameAsync(courseTeacher);
                 }
                 else
                 {
-                    var c = _courseService.ListClassByCourseName(courseName).ToHashSet();
-                    c.IntersectWith(_courseService.ListClassByTeacherName(courseTeacher));
+                    var c = (await _courseService.ListClassByCourseNameAsync(courseName)).ToHashSet();
+                    c.IntersectWith(await _courseService.ListClassByTeacherNameAsync(courseTeacher));
                     classes = c.ToList();
                 }
 
-                return Json(classes.Select(c => new
+                return Json(await Task.WhenAll(classes.Select(async c =>
                 {
-                    id = c.Id,
-                    name = c.Name,
-                    site = c.Site,
-                    time = c.ClassTime,
-                    courseId = c.CourseId,
-                    courseName = _courseService.GetCourseByCourseId(c.CourseId).Name,
-                    courseTeacher =
-                    _userService.GetUserByUserId(_courseService.GetCourseByCourseId(c.CourseId).TeacherId).Name,
-                    numStudent = _db.Entry(c).Collection(cl => cl.CourseSelections).Query().Count()
-                }));
+                    var co = await _courseService.GetCourseByCourseIdAsync(c.CourseId);
+                    return new
+                    {
+                        id = c.Id,
+                        name = c.Name,
+                        site = c.Site,
+                        time = c.ClassTime,
+                        courseId = c.CourseId,
+                        courseName = co.Name,
+                        courseTeacher =
+                            (await _userService
+                                .GetUserByUserIdAsync(co.TeacherId))
+                                .Name,
+                        numStudent = _db.Entry(c).Collection(cl => cl.CourseSelections).Query().Count()
+                    };
+                })));
             }
             catch (ArgumentException)
             {
@@ -82,13 +89,13 @@ namespace Xmu.Crms.Insomnia
 
         [HttpGet("/class/{classId:long}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult GetClassById([FromRoute] long classId)
+        public async Task<IActionResult> GetClassById([FromRoute] long classId)
         {
             try
             {
-                var cls = _classService.GetClassByClassId(classId);
-                var sems = _seminarService.ListSeminarByCourseId(cls.CourseId).FirstOrDefault(s =>
-                    (_classService.GetCallStatusById(s.Id, cls.Id)?.Status ?? 0) == 1);
+                var cls = await _classService.GetClassByClassIdAsync(classId);
+                var sems = (await _seminarService.ListSeminarByCourseIdAsync(cls.CourseId)).FirstOrDefault(s =>
+                    (_classService.GetCallStatusByIdAsync(s.Id, cls.Id).Result?.Status ?? 0) == 1);
                 return Json(new
                 {
                     id = cls.Id,
@@ -114,14 +121,14 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpDelete("/class/{classId:long}")]
-        public IActionResult DeleteClassById([FromRoute] long classId)
+        public async Task<IActionResult> DeleteClassById([FromRoute] long classId)
         {
             try
             {
-                var userlogin = _userService.GetUserByUserId(User.Id());
+                var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
                 if (userlogin.Type == Type.Teacher)
                 {
-                    _classService.DeleteClassByClassId(classId);
+                    await _classService.DeleteClassByClassIdAsync(classId);
                     return NoContent();
                 }
 
@@ -138,17 +145,17 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPut("/class/{classId:long}")]
-        public IActionResult UpdateClassById([FromRoute] long classId, [FromBody] ClassWithProportions updated)
+        public async Task<IActionResult> UpdateClassById([FromRoute] long classId, [FromBody] ClassWithProportions updated)
         {
             try
             {
-                var userlogin = _userService.GetUserByUserId(User.Id());
+                var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
                 if (userlogin.Type != Type.Teacher)
                 {
                     return StatusCode(403, new {msg = "权限不足"});
                 }
 
-                _classService.UpdateClassByClassId(classId, new ClassInfo
+                await _classService.UpdateClassByClassIdAsync(classId, new ClassInfo
                 {
                     Id = classId,
                     Name = updated.Name,
@@ -173,12 +180,12 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/class/{classId:long}/student")]
-        public IActionResult GetStudentsByClassId([FromRoute] long classId, [FromQuery] string numBeginWith,
+        public async Task<IActionResult> GetStudentsByClassId([FromRoute] long classId, [FromQuery] string numBeginWith,
             string nameBeginWith)
         {
             try
             {
-                var users = _userService.ListUserByClassId(classId, numBeginWith, nameBeginWith);
+                var users = await _userService.ListUserByClassIdAsync(classId, numBeginWith, nameBeginWith);
                 return Json(users.Select(u => new {id = u.Id, name = u.Name, number = u.Number}));
             }
             catch (ClassNotFoundException)
@@ -194,17 +201,16 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPost("/class/{classId:long}/student")]
-        public IActionResult SelectClass([FromRoute] long classId, [FromBody] UserInfo student)
+        public async Task<IActionResult> SelectClass([FromRoute] long classId, [FromBody] UserInfo student)
         {
             try
             {
-                var user = student;
-                var userlogin = _userService.GetUserByUserId(User.Id());
+                var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
                 if (userlogin.Type == Type.Student)
                 {
                     if (User.Id() == student.Id)
                     {
-                        _classService.InsertCourseSelectionById(student.Id, classId);
+                        await _classService.InsertCourseSelectionByIdAsync(student.Id, classId);
                         return Created($"/class/{classId}/student/{student.Id}",
                             new Dictionary<string, string> {["url"] = $"/class/{classId}/student/{student.Id}"});
                     }
@@ -225,16 +231,16 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpDelete("/class/{classId:long}/student/{studentId:long}")]
-        public IActionResult DeselectClass([FromRoute] long classId, [FromRoute] long studentId)
+        public async Task<IActionResult> DeselectClass([FromRoute] long classId, [FromRoute] long studentId)
         {
             try
             {
-                var userlogin = _userService.GetUserByUserId(User.Id());
+                var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
                 if (userlogin.Type == Type.Student)
                 {
                     if (studentId == User.Id())
                     {
-                        _classService.DeleteCourseSelectionById(studentId, classId);
+                        await _classService.DeleteCourseSelectionByIdAsync(studentId, classId);
                         return NoContent();
                     }
 
@@ -249,37 +255,20 @@ namespace Xmu.Crms.Insomnia
             }
         }
 
-        /*
-         * 这两部分移除，放在SeminarController里面
-         */
-        //[HttpGet("/class/{classId:long}/attendance")]
-        //public IActionResult GetAttendanceByClassId([FromRoute] long classId)
-        //{
-
-        //    return Json(new List<ClassInfo>());
-        //}
-
-        //[HttpPut("/class/{classId:long}/attendance/{studentId:long}")]
-        //public IActionResult UpdateAttendanceByClassId([FromRoute] long classId, [FromRoute] long studentId,
-        //    [FromBody] Location loc)
-        //{
-        //    return NoContent();
-        //}
-
         [HttpGet("/class/{classId}/classgroup")]
-        public IActionResult GetUserClassGroupByClassId([FromRoute] long classId)
+        public async Task<IActionResult> GetUserClassGroupByClassId([FromRoute] long classId)
         {
             try
             {
-                var userlogin = _userService.GetUserByUserId(User.Id());
+                var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
                 if (userlogin.Type != Type.Student)
                 {
                     return StatusCode(403, new {msg = "权限不足"});
                 }
 
-                var fixGroup = _fixGroupService.GetFixedGroupById(User.Id(), classId);
-                var leader = fixGroup.Leader ?? _userService.GetUserByUserId(fixGroup.LeaderId);
-                var members = _fixGroupService.ListFixGroupMemberByGroupId(fixGroup.Id);
+                var fixGroup = await _fixGroupService.GetFixedGroupByIdAsync(User.Id(), classId);
+                var leader = fixGroup.Leader ?? await _userService.GetUserByUserIdAsync(fixGroup.LeaderId);
+                var members = await _fixGroupService.ListFixGroupMemberByGroupIdAsync(fixGroup.Id);
                 var result = Json(
                     new
                     {
@@ -304,38 +293,13 @@ namespace Xmu.Crms.Insomnia
             }
         }
 
-        /*
-         * 这一部分删去，增加了新的方法
-         */
-        //[HttpPut("/class/{classId}/classgroup")]
-        //public IActionResult UpdateUserClassGroupByClassId([FromRoute] long classId, [FromBody] FixGroup updated)
-        //{
-        //    try
-        //    {
-
-        //        return NoContent();
-        //    }
-        //    catch (ClassNotFoundException)
-        //    {
-        //        return StatusCode(404, new {msg = "不存在当前班级"});
-        //    }
-        //    catch (ArgumentException)
-        //    {
-        //        return StatusCode(400, new {msg = "班级ID格式有误"});
-        //    }
-        //}
-
-        /*
-         * 以下的四个controller为新添加的controller
-         * 前两个方法模块组的同学说不会被调用，先不写
-         */
         [HttpPut("/class/{classId}/classgroup/resign")]
         public IActionResult GroupLeaderResignByClassId([FromRoute] long classId, [FromBody] UserInfo student)
         {
             try
             {
-                //var groupId = _fixGroupService.GetFixedGroupById()
-                //_seminarGroupService.ResignLeaderById
+                //var groupId = _fixGroupService.GetFixedGroupByIdAsync()
+                //_seminarGroupService.ResignLeaderByIdAsync
                 return NoContent();
             }
             catch (ClassNotFoundException)
@@ -353,8 +317,8 @@ namespace Xmu.Crms.Insomnia
         {
             try
             {
-                //var groupId = _fixGroupService.GetFixedGroupById()
-                //_seminarGroupService.ResignLeaderById
+                //var groupId = _fixGroupService.GetFixedGroupByIdAsync()
+                //_seminarGroupService.ResignLeaderByIdAsync
                 return NoContent();
             }
             catch (ClassNotFoundException)
@@ -368,12 +332,12 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPut("/class/{classId}/classgroup/add")]
-        public IActionResult AddGroupMemberByClassId([FromRoute] long classId, [FromBody] UserInfo student)
+        public async Task<IActionResult> AddGroupMemberByClassId([FromRoute] long classId, [FromBody] UserInfo student)
         {
             try
             {
-                var group = _fixGroupService.GetFixedGroupById(User.Id(), classId);
-                _fixGroupService.InsertStudentIntoGroup(student.Id, group.Id);
+                var group = await _fixGroupService.GetFixedGroupByIdAsync(User.Id(), classId);
+                await _fixGroupService.InsertStudentIntoGroupAsync(student.Id, @group.Id);
                 return NoContent();
             }
             catch (ClassNotFoundException)
@@ -387,12 +351,12 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPut("/class/{classId}/classgroup/remove")]
-        public IActionResult RemoveGroupMemberByClassId([FromRoute] long classId, [FromBody] UserInfo student)
+        public async Task<IActionResult> RemoveGroupMemberByClassId([FromRoute] long classId, [FromBody] UserInfo student)
         {
             try
             {
-                var group = _fixGroupService.GetFixedGroupById(User.Id(), classId);
-                _fixGroupService.DeleteFixGroupUserById(group.Id, student.Id);
+                var group = await _fixGroupService.GetFixedGroupByIdAsync(User.Id(), classId);
+                await _fixGroupService.DeleteFixGroupUserByIdAsync(@group.Id, student.Id);
                 return NoContent();
             }
             catch (ClassNotFoundException)

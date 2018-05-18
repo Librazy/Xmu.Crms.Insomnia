@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xmu.Crms.Services.ViceVersa.Daos;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
@@ -25,167 +27,60 @@ namespace Xmu.Crms.Services.ViceVersa.Services
             _iSeminarService = iSeminarService;
         }
 
-        public void DeleteStudentScoreGroupByTopicId(long topicId)
+        public async Task DeleteStudentScoreGroupByTopicIdAsync(long topicId)
         {
-            try
-            {
-                _iGradeDao.DeleteStudentScoreGroupByTopicId(topicId);
-            }
-            catch
-            {
-                throw;
-            }
+            await _iGradeDao.DeleteStudentScoreGroupByTopicIdAsync(topicId);
         }
 
-        public SeminarGroup GetSeminarGroupBySeminarGroupId(long seminarGroupId)
+        public Task<SeminarGroup> GetSeminarGroupBySeminarGroupIdAsync(long seminarGroupId)
         {
-            try
-            {
-                return _iGradeDao.GetSeminarGroupBySeminarGroupId(seminarGroupId);
-            }
-            catch (GroupNotFoundException e1)
-            {
-                throw e1;
-            }
+            return _iGradeDao.GetSeminarGroupBySeminarGroupIdAsync(seminarGroupId);
         }
 
-        public IList<SeminarGroup> ListSeminarGradeByCourseId(long userId, long courseId)
+        public async Task<IList<SeminarGroup>> ListSeminarGradeByCourseIdAsync(long userId, long courseId)
         {
-            var seminarGroupList = new List<SeminarGroup>();
-            var seminarList = new List<Seminar>();
-            try
-            {
-                //调用SeminarService 中 IList<Seminar> ListSeminarByCourseId(long courseId)方法
-                _iSeminarService.ListSeminarByCourseId(courseId);
+            var seminarList =  await _iSeminarService.ListSeminarByCourseIdAsync(courseId);
 
-                //调用SeminarGroupService 中 SeminarGroup GetSeminarGroupById(long seminarId, long userId)
-                for (var i = 0; i < seminarList.Count; i++)
-                {
-                    seminarGroupList.Add(_iSeminarGroupService.GetSeminarGroupById(seminarList[0].Id, userId));
-                }
-            }
-            catch (CourseNotFoundException cre)
-            {
-                throw cre;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+                //调用SeminarGroupService 中 SeminarGroup GetSeminarGroupByIdAsync(long seminarId, long userId)
 
-            return seminarGroupList;
+
+            return await Task.WhenAll(seminarList.Select(async t => await _iSeminarGroupService.GetSeminarGroupByIdAsync(t.Id, userId)));
         }
 
-        public void InsertGroupGradeByUserId(long topicId, long userId, long groupId, int grade)
+        public async Task InsertGroupGradeByUserIdAsync(long topicId, long userId, long groupId, int grade)
         {
-            try
-            {
+
                 //调用TopicService中GetSeminarGroupTopicById(long topicId, long groupId)方法 
-                var seminarGroupTopic = _iTopicService.GetSeminarGroupTopicById(topicId, groupId);
+                var seminarGroupTopic = await _iTopicService.GetSeminarGroupTopicByIdAsync(topicId, groupId);
                 //调用UserService中的GetUserByUserId(long userId)方法
-                var userInfo = _iUserService.GetUserByUserId(userId);
+                var userInfo = await _iUserService.GetUserByUserIdAsync(userId);
                 //调用自己的dao
-                _iGradeDao.InsertGroupGradeByUserId(seminarGroupTopic, userInfo, grade);
-            }
-            catch (GroupNotFoundException gre)
-            {
-                throw gre;
-            }
-            catch (UserNotFoundException ure)
-            {
-                throw ure;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+                await _iGradeDao.InsertGroupGradeByUserIdAsync(seminarGroupTopic, userInfo, grade);
         }
 
-        public void UpdateGroupByGroupId(long seminarGroupId, int grade)
+        public Task UpdateGroupByGroupIdAsync(long seminarGroupId, int grade)
         {
-            try
-            {
-                _iGradeDao.UpdateGroupByGroupId(seminarGroupId, grade);
-            }
-            catch (GroupNotFoundException gre)
-            {
-                throw gre;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+
+           return _iGradeDao.UpdateGroupByGroupIdAsync(seminarGroupId, grade);
+
         }
 
-        public void CountPresentationGrade(long seminarId)
+        public async Task CountPresentationGradeAsync(long seminarId)
         {
-            try
-            {
-                //调用TopicService 的 IList<Topic> ListTopicBySeminarId(long seminarId)方法
-                var topicList = _iTopicService.ListTopicBySeminarId(seminarId);
+                //调用TopicService 的 IList<Topic> ListTopicBySeminarIdAsync(long seminarId)方法
+                var topicList = await _iTopicService.ListTopicBySeminarIdAsync(seminarId);
 
                 //调用自己的dao分别对每个topic计算
-                _iGradeDao.CountPresentationGrade(seminarId, topicList);
-            }
-            catch (TopicNotFoundException ure)
-            {
-                throw ure;
-            }
-            catch (GroupNotFoundException gre)
-            {
-                throw gre;
-            }
-            catch (SeminarNotFoundException sme)
-            {
-                throw sme;
-            }
-            catch (ClassNotFoundException cle)
-            {
-                throw cle;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+                await _iGradeDao.CountPresentationGradeAsync(seminarId, topicList);
         }
 
-        public void CountGroupGradeBySerminarId(long seminarId)
+        public async Task CountGroupGradeBySerminarIdAsync(long seminarId)
         {
-            try
-            {
                 ////调用SeminarGroupService中的ListSeminarGroupBySeminarId 方法
-                var seminarGroupList = _iSeminarGroupService.ListSeminarGroupBySeminarId(seminarId);
+                var seminarGroupList = await _iSeminarGroupService.ListSeminarGroupBySeminarIdAsync(seminarId);
 
-                _iGradeDao.CountGroupGradeBySerminarId(seminarId, seminarGroupList);
-            }
-            catch (SeminarNotFoundException sme)
-            {
-                throw sme;
-            }
-            catch (GroupNotFoundException gre)
-            {
-                throw gre;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
+            await _iGradeDao.CountGroupGradeBySerminarIdAsync(seminarId, seminarGroupList);
 
-        public IList<SeminarGroup> ListSeminarGradeByStudentId(long userId)
-        {
-            try
-            {
-                return _iSeminarGroupService.ListSeminarGroupIdByStudentId(userId);
-            }
-            catch (UserNotFoundException ure)
-            {
-                throw ure;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
         }
     }
 }

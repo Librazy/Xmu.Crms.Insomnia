@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Shared.Service
@@ -16,7 +17,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="courseId">课程id</param>
         /// <param name="classInfo">班级信息</param>
         /// <returns>classId 班级Id</returns>
-        long InsertClassById(long courseId, ClassInfo classInfo);
+        Task<long> InsertClassByIdAsync(long courseId, ClassInfo classInfo);
 
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="userId">用户Id</param>
         /// <returns>null 课程列表</returns>
         /// <exception cref="T:System.ArgumentException">userId格式错误时抛出</exception>
-        IList<Course> ListCourseByUserId(long userId);
+        Task<IList<Course>> ListCourseByUserIdAsync(long userId);
 
 
         /// <summary>
@@ -37,7 +38,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="course">课程信息</param>
         /// <returns>courseId 新建课程的id</returns>
         /// <exception cref="T:System.ArgumentException">userId格式错误时抛出</exception>
-        long InsertCourseByUserId(long userId, Course course);
+        Task<long> InsertCourseByUserIdAsync(long userId, Course course);
 
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace Xmu.Crms.Shared.Service
         /// <returns>course</returns>
         /// <exception cref="T:System.ArgumentException">userId格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.CourseNotFoundException">未找到课程</exception>
-        Course GetCourseByCourseId(long courseId);
+        Task<Course> GetCourseByCourseIdAsync(long courseId);
 
 
         /// <summary>
@@ -57,7 +58,7 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="courseId">课程Id</param>
         /// <param name="course">课程信息</param>
-        void UpdateCourseByCourseId(long courseId, Course course);
+        Task UpdateCourseByCourseIdAsync(long courseId, Course course);
 
 
         /// <summary>
@@ -65,11 +66,11 @@ namespace Xmu.Crms.Shared.Service
         ///     @author ZhouZhongjun
         /// </summary>
         /// <param name="courseId">课程Id</param>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarService.DeleteSeminarByCourseId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.DeleteClassByCourseId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarService.DeleteSeminarByCourseIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.DeleteClassByCourseIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">courseId格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.CourseNotFoundException">未找到课程</exception>
-        void DeleteCourseByCourseId(long courseId);
+        Task DeleteCourseByCourseIdAsync(long courseId);
 
 
         /// <summary>
@@ -78,8 +79,8 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="courseName">课程名称</param>
         /// <returns>list 课程列表</returns>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.GetCourseByCourseId(System.Int64)" />
-        IList<Course> ListCourseByCourseName(string courseName);
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.GetCourseByCourseIdAsync(System.Int64)" />
+        Task<IList<Course>> ListCourseByCourseNameAsync(string courseName);
 
 
         /// <summary>
@@ -88,9 +89,9 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="courseName">课程名称</param>
         /// <returns>list 班级列表</returns>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListCourseByCourseName(System.String)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.ListClassByCourseId(System.Int64)" />
-        IList<ClassInfo> ListClassByCourseName(string courseName);
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListCourseByCourseNameAsync(System.String)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.ListClassByCourseIdAsync(System.Int64)" />
+        Task<IList<ClassInfo>> ListClassByCourseNameAsync(string courseName);
 
 
         /// <summary>
@@ -99,9 +100,9 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="teacherName">教师名称</param>
         /// <returns>list 班级列表</returns>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IUserService.ListUserIdByUserName(System.String)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListClassByUserId(System.Int64)" />
-        IList<ClassInfo> ListClassByTeacherName(string teacherName);
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IUserService.ListUserIdByUserNameAsync(System.String)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListClassByUserIdAsync(System.Int64)" />
+        Task<IList<ClassInfo>> ListClassByTeacherNameAsync(string teacherName);
 
 
         /// <summary>
@@ -110,10 +111,10 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="userId">学生ID</param>
         /// <returns>list 班级列表</returns>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListCourseByUserId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.ListClassByCourseId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListCourseByUserIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.ListClassByCourseIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">userId格式错误时抛出</exception>
-        IList<ClassInfo> ListClassByName(string courseName, string teacherName);
+        Task<IList<ClassInfo>> ListClassByNameAsync(string courseName, string teacherName);
 
         /// <summary>
         ///     根据教师名称列出课程名称.
@@ -121,8 +122,9 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="teacherName">教师名称</param>
         /// <returns>list 课程列表</returns>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IUserService.ListUserByUserName(System.String)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListCourseByUserId(System.Int64)" />
-        IList<Course> ListCourseByTeacherName(string teacherName);
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IUserService.ListUserByUserNameAsync(System.String)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListCourseByUserIdAsync(System.Int64)" />
+        Task<IList<Course>> 
+            ListCourseByTeacherNameAsync(string teacherName);
     }
 }

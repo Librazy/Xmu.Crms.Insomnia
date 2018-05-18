@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
@@ -16,9 +17,10 @@ namespace Xmu.Crms.Services.Insomnia
         public UserService(CrmsContext db) => _db = db;
 
         /// <inheritdoc />
-        public void InsertAttendanceById(long classId, long seminarId, long userId, double longitude, double latitude)
+        public async Task InsertAttendanceByIdAsync(long classId, long seminarId, long userId, double longitude,
+            double latitude)
         {
-            var usr = GetUserByUserId(userId);
+            var usr = await GetUserByUserIdAsync(userId);
             var cls = _db.ClassInfo.Find(classId) ?? throw new ClassNotFoundException();
             var sem = _db.Seminar.Find(seminarId) ?? throw new SeminarNotFoundException();
             var loc = _db.Location.Include(a => a.ClassInfo).Include(a => a.Seminar)
@@ -31,39 +33,39 @@ namespace Xmu.Crms.Services.Insomnia
                 Seminar = sem,
                 Student = usr
             });
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public IList<Attendance> ListAttendanceById(long classId, long seminarId)
+        public async Task<IList<Attendance>> ListAttendanceByIdAsync(long classId, long seminarId)
         {
             var cls = _db.ClassInfo.Find(classId) ?? throw new ClassNotFoundException();
             var sem = _db.Seminar.Find(seminarId) ?? throw new SeminarNotFoundException();
-            return _db.Attendences.Include(a => a.ClassInfo).Include(a => a.Seminar)
-                .Where(a => a.ClassInfo == cls && a.Seminar == sem).ToList();
+            return await _db.Attendences.Include(a => a.ClassInfo).Include(a => a.Seminar)
+                .Where(a => a.ClassInfo == cls && a.Seminar == sem).ToListAsync();
         }
 
         /// <inheritdoc />
-        public UserInfo GetUserByUserId(long userId) => _db.UserInfo.Find(userId) ??
+        public async Task<UserInfo> GetUserByUserIdAsync(long userId) => await _db.UserInfo.FindAsync(userId) ??
                                                         throw new UserNotFoundException();
 
         /// <inheritdoc />
-        public UserInfo GetUserByUserNumber(string userNumber)
+        public Task<UserInfo> GetUserByUserNumberAsync(string userNumber)
         {
-            return _db.UserInfo.SingleOrDefault(u => u.Number == userNumber) ??
+            return _db.UserInfo.SingleOrDefaultAsync(u => u.Number == userNumber) ??
                    throw new UserNotFoundException();
         }
 
         /// <inheritdoc />
-        public IList<long> ListUserIdByUserName(string userName)
+        public async Task<IList<long>> ListUserIdByUserNameAsync(string userName)
         {
-            return _db.UserInfo.Where(u => u.Name.StartsWith(userName)).Select(u => u.Id).ToList();
+            return await _db.UserInfo.Where(u => u.Name.StartsWith(userName)).Select(u => u.Id).ToListAsync();
         }
 
         /// <inheritdoc />
-        public void UpdateUserByUserId(long userId, UserInfo user)
+        public async Task UpdateUserByUserIdAsync(long userId, UserInfo user)
         {
-            var usr = GetUserByUserId(userId);
+            var usr = await GetUserByUserIdAsync(userId);
             usr.Name = user.Name;
             usr.Avatar = user.Avatar;
             usr.Education = user.Education ?? Education.Bachelor;
@@ -94,7 +96,7 @@ namespace Xmu.Crms.Services.Insomnia
         }
 
         /// <inheritdoc />
-        public IList<UserInfo> ListUserByClassId(long classId, string numBeginWith, string nameBeginWith)
+        public async Task<IList<UserInfo>> ListUserByClassIdAsync(long classId, string numBeginWith, string nameBeginWith)
         {
             var cls = _db.ClassInfo.Find(classId) ?? throw new ClassNotFoundException();
             var userInfos = _db.CourseSelection.Include(c => c.ClassInfo).Include(c => c.Student)
@@ -109,43 +111,43 @@ namespace Xmu.Crms.Services.Insomnia
                 userInfos = userInfos.Where(u => u.Number.StartsWith(numBeginWith));
             }
 
-            return userInfos.ToList();
+            return await userInfos.ToListAsync();
         }
 
         /// <inheritdoc />
-        public IList<UserInfo> ListUserByUserName(string userName)
+        public async Task<IList<UserInfo>> ListUserByUserNameAsync(string userName)
         {
-            return _db.UserInfo.Where(u => u.Name.StartsWith(userName)).ToList();
+            return await _db.UserInfo.Where(u => u.Name.StartsWith(userName)).ToListAsync();
         }
 
         /// <inheritdoc />
-        public IList<UserInfo> ListPresentStudent(long seminarId, long classId)
+        public async Task<IList<UserInfo>> ListPresentStudentAsync(long seminarId, long classId)
         {
             var cls = _db.ClassInfo.Find(classId) ?? throw new ClassNotFoundException();
             var sem = _db.Seminar.Find(seminarId) ?? throw new SeminarNotFoundException();
-            return _db.Attendences.Include(a => a.ClassInfo).Include(a => a.Seminar).Where(a =>
+            return await _db.Attendences.Include(a => a.ClassInfo).Include(a => a.Seminar).Where(a =>
                     a.ClassInfo == cls && a.Seminar == sem && a.AttendanceStatus == AttendanceStatus.Present)
-                .Select(a => a.Student).ToList();
+                .Select(a => a.Student).ToListAsync();
         }
 
         /// <inheritdoc />
-        public IList<UserInfo> ListLateStudent(long seminarId, long classId)
+        public async Task<IList<UserInfo>> ListLateStudentAsync(long seminarId, long classId)
         {
             var cls = _db.ClassInfo.Find(classId) ?? throw new ClassNotFoundException();
             var sem = _db.Seminar.Find(seminarId) ?? throw new SeminarNotFoundException();
-            return _db.Attendences.Include(a => a.ClassInfo).Include(a => a.Seminar).Where(a =>
+            return await _db.Attendences.Include(a => a.ClassInfo).Include(a => a.Seminar).Where(a =>
                     a.ClassInfo == cls && a.Seminar == sem && a.AttendanceStatus == AttendanceStatus.Late)
-                .Select(a => a.Student).ToList();
+                .Select(a => a.Student).ToListAsync();
         }
 
         /// <inheritdoc />
-        public IList<UserInfo> ListAbsenceStudent(long seminarId, long classId)
+        public async Task<IList<UserInfo>> ListAbsenceStudentAsync(long seminarId, long classId)
         {
             var cls = _db.ClassInfo.Find(classId) ?? throw new ClassNotFoundException();
             var sem = _db.Seminar.Find(seminarId) ?? throw new SeminarNotFoundException();
-            return _db.Attendences.Include(a => a.ClassInfo).Include(a => a.Seminar).Where(a =>
+            return await _db.Attendences.Include(a => a.ClassInfo).Include(a => a.Seminar).Where(a =>
                     a.ClassInfo == cls && a.Seminar == sem && a.AttendanceStatus == AttendanceStatus.Absent)
-                .Select(a => a.Student).ToList();
+                .Select(a => a.Student).ToListAsync();
         }
     }
 }

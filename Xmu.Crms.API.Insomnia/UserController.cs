@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -33,12 +34,12 @@ namespace Xmu.Crms.Insomnia
 
         [HttpGet("/me")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult GetCurrentUser()
+        public async Task<IActionResult> GetCurrentUser()
         {
             try
             {
-                var user = _userService.GetUserByUserId(User.Id());
-                user.School = _schoolService.GetSchoolBySchoolId(user.SchoolId ?? -1);
+                var user = await _userService.GetUserByUserIdAsync(User.Id());
+                user.School = await _schoolService.GetSchoolBySchoolIdAsync(user.SchoolId ?? -1);
                 return Json(user, Ignoring("City", "Province", "Password"));
             }
             catch (UserNotFoundException)
@@ -49,11 +50,11 @@ namespace Xmu.Crms.Insomnia
 
         [HttpPut("/me")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult UpdateCurrentUser([FromBody] UserInfo updated)
+        public async Task<IActionResult> UpdateCurrentUser([FromBody] UserInfo updated)
         {
             try
             {
-                _userService.UpdateUserByUserId(User.Id(), updated);
+                await _userService.UpdateUserByUserIdAsync(User.Id(), updated);
                 return NoContent();
             }
             catch (UserNotFoundException)
@@ -67,12 +68,12 @@ namespace Xmu.Crms.Insomnia
             [FromQuery(Name = "success_url")] string successUrl) => throw new NotSupportedException();
 
         [HttpPost("/signin")]
-        public IActionResult SigninPassword([FromBody] UsernameAndPassword uap)
+        public async Task<IActionResult> SigninPassword([FromBody] UsernameAndPassword uap)
         {
             try
             {
-                var user = _loginService.SignInPhone(new UserInfo {Phone = uap.Phone, Password = uap.Password});
-                HttpContext.SignInAsync(JwtBearerDefaults.AuthenticationScheme, new ClaimsPrincipal());
+                var user = await _loginService.SignInPhoneAsync(new UserInfo {Phone = uap.Phone, Password = uap.Password});
+                await HttpContext.SignInAsync(JwtBearerDefaults.AuthenticationScheme, new ClaimsPrincipal());
                 return Json(CreateSigninResult(user));
             }
             catch (PasswordErrorException)
@@ -86,11 +87,11 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPost("/register")]
-        public IActionResult RegisterPassword([FromBody] UsernameAndPassword uap)
+        public async Task<IActionResult> RegisterPassword([FromBody] UsernameAndPassword uap)
         {
             try
             {
-                var user = _loginService.SignUpPhone(new UserInfo {Phone = uap.Phone, Password = uap.Password});
+                var user = await _loginService.SignUpPhoneAsync(new UserInfo {Phone = uap.Phone, Password = uap.Password});
                 return Json(CreateSigninResult(user));
             }
             catch (PhoneAlreadyExistsException)

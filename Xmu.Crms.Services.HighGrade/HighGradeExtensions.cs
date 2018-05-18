@@ -10,8 +10,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection AddHighGradeSchoolService(this IServiceCollection serviceCollection) =>
             serviceCollection.AddScoped<ISchoolService, SchoolService>();
-
-        public static IServiceCollection AddHighGradeLoginService(this IServiceCollection serviceCollection) =>
-            serviceCollection.AddScoped<ILoginService, LoginService>();
     }
 }

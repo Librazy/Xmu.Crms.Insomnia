@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,15 +22,17 @@ namespace Xmu.Crms.Insomnia
         private readonly IGradeService _gradeService;
         private readonly ISeminarGroupService _seminarGroupService;
         private readonly ITopicService _topicService;
-        private readonly IUserService _userService;
 
-        public GroupController(ICourseService courseService, IClassService classService,
-            IUserService userService, IFixGroupService fixGroupService,
-            ISeminarGroupService seminarGroupService, ITopicService topicService,
+        public GroupController(
+            ICourseService courseService,
+            IClassService classService,
+            IFixGroupService fixGroupService,
+            ISeminarGroupService seminarGroupService,
+            ITopicService topicService,
             ISeminarService seminarService,
-            IGradeService gradeService, JwtHeader header)
+            IGradeService gradeService,
+            JwtHeader header)
         {
-            _userService = userService;
             _fixGroupService = fixGroupService;
             _seminarGroupService = seminarGroupService;
             _topicService = topicService;
@@ -37,13 +40,13 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/group/{groupId:long}")]
-        public IActionResult GetGroupById([FromRoute] long groupId, [FromQuery] bool embedGrade = false)
+        public async Task<IActionResult> GetGroupById([FromRoute] long groupId, [FromQuery] bool embedGrade = false)
         {
             try
             {
-                var group = _seminarGroupService.GetSeminarGroupByGroupId(groupId);
-                var members = _seminarGroupService.ListSeminarGroupMemberByGroupId(groupId);
-                var topics = _topicService.ListSeminarGroupTopicByGroupId(groupId);
+                var group = await _seminarGroupService.GetSeminarGroupByGroupIdAsync(groupId);
+                var members = await _seminarGroupService.ListSeminarGroupMemberByGroupIdAsync(groupId);
+                var topics = await _topicService.ListSeminarGroupTopicByGroupIdAsync(groupId);
                 if (!embedGrade)
                 {
                     return Json(new
@@ -91,11 +94,12 @@ namespace Xmu.Crms.Insomnia
                     report = group.Report,
                     grade = new
                     {
-                        presentationGrade = _topicService.ListSeminarGroupTopicByGroupId(groupId).Select(p => new
-                        {
-                            id = p.Id,
-                            grade = p.PresentationGrade
-                        }),
+                        presentationGrade = _topicService.ListSeminarGroupTopicByGroupIdAsync(groupId).Result.Select(
+                            p => new
+                            {
+                                id = p.Id,
+                                grade = p.PresentationGrade
+                            }),
                         reportGrade = group.ReportGrade,
                         grade = group.FinalGrade
                     }
@@ -115,7 +119,8 @@ namespace Xmu.Crms.Insomnia
          * 没有找到相应的修改seminarGroup的方法，修改了SeminarGroup变为FixedGroup
          */
         [HttpPut("/group/{groupId:long}")]
-        public IActionResult UpdateGroupById([FromRoute] long groupId, [FromBody] /*SeminarGroup*/FixGroup updated)
+        public async Task<IActionResult> UpdateGroupById([FromRoute] long groupId,
+            [FromBody] /*SeminarGroup*/FixGroup updated)
         {
             try
             {
@@ -124,7 +129,7 @@ namespace Xmu.Crms.Insomnia
                     return StatusCode(403, new {msg = "权限不足"});
                 }
 
-                _fixGroupService.UpdateFixGroupByGroupId(groupId, updated);
+                await _fixGroupService.UpdateFixGroupByGroupIdAsync(groupId, updated);
                 return NoContent();
             }
             catch (GroupNotFoundException)
@@ -138,7 +143,7 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPost("/group/{groupId:long}/topic")]
-        public IActionResult SelectTopic([FromRoute] long groupId, [FromBody] Topic selected)
+        public async Task<IActionResult> SelectTopic([FromRoute] long groupId, [FromBody] Topic selected)
         {
             try
             {
@@ -147,7 +152,7 @@ namespace Xmu.Crms.Insomnia
                     return StatusCode(403, new {msg = "权限不足"});
                 }
 
-                _seminarGroupService.InsertTopicByGroupId(groupId, selected.Id);
+                await _seminarGroupService.InsertTopicByGroupIdAsync(groupId, selected.Id);
                 return Created($"/group/{groupId}/topic/{selected.Id}",
                     new Dictionary<string, string> {["url"] = $" /group/{groupId}/topic/{selected.Id}"});
             }
@@ -162,7 +167,7 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpDelete("/group/{groupId:long}/topic/{topicId:long}")]
-        public IActionResult DeselectTopic([FromRoute] long groupId, [FromRoute] long topicId)
+        public async Task<IActionResult> DeselectTopic([FromRoute] long groupId, [FromRoute] long topicId)
         {
             try
             {
@@ -171,7 +176,7 @@ namespace Xmu.Crms.Insomnia
                     return StatusCode(403, new {msg = "权限不足"});
                 }
 
-                _topicService.DeleteSeminarGroupTopicById(groupId, topicId);
+                await _topicService.DeleteSeminarGroupTopicByIdAsync(groupId, topicId);
                 return NoContent();
             }
             catch (GroupNotFoundException)
@@ -185,12 +190,12 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/group/{groupId:long}/grade")]
-        public IActionResult GetGradeByGroupId([FromRoute] long groupId)
+        public async Task<IActionResult> GetGradeByGroupId([FromRoute] long groupId)
         {
             try
             {
-                var group = _seminarGroupService.GetSeminarGroupByGroupId(groupId);
-                var pGradeTopics = _topicService.ListSeminarGroupTopicByGroupId(groupId);
+                var group = await _seminarGroupService.GetSeminarGroupByGroupIdAsync(groupId);
+                var pGradeTopics = await _topicService.ListSeminarGroupTopicByGroupIdAsync(groupId);
                 return Json(new
                 {
                     presentationGrade = pGradeTopics.Select(p => new
@@ -213,7 +218,8 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPut("/group/{groupId:long}/grade/report")]
-        public IActionResult UpdateGradeByGroupId([FromRoute] long groupId, [FromBody] StudentScoreGroup updated)
+        public async Task<IActionResult> UpdateGradeByGroupId([FromRoute] long groupId,
+            [FromBody] StudentScoreGroup updated)
         {
             try
             {
@@ -224,7 +230,7 @@ namespace Xmu.Crms.Insomnia
 
                 if (updated.Grade != null)
                 {
-                    _gradeService.UpdateGroupByGroupId(groupId, (int) updated.Grade);
+                    await _gradeService.UpdateGroupByGroupIdAsync(groupId, (int) updated.Grade);
                 }
 
                 return NoContent();
@@ -240,7 +246,7 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPut("/group/{groupId:long}/grade/presentation/{studentId:long}")]
-        public IActionResult SubmitStudentGradeByGroupId([FromBody] long groupId, [FromBody] long studentId,
+        public async Task<IActionResult> SubmitStudentGradeByGroupId([FromBody] long groupId, [FromBody] long studentId,
             [FromBody] StudentScoreGroup updated)
         {
             try
@@ -255,7 +261,8 @@ namespace Xmu.Crms.Insomnia
                     return NoContent();
                 }
 
-                _gradeService.InsertGroupGradeByUserId(updated.SeminarGroupTopic.Topic.Id, updated.Student.Id,
+                await _gradeService.InsertGroupGradeByUserIdAsync(updated.SeminarGroupTopic.Topic.Id,
+                    updated.Student.Id,
                     groupId, (int) updated.Grade);
                 return NoContent();
             }

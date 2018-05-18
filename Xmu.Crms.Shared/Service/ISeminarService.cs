@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Shared.Service
@@ -17,7 +18,7 @@ namespace Xmu.Crms.Shared.Service
         /// <returns>List 讨论课列表</returns>
         /// <exception cref="T:System.ArgumentException">格式错误、教师设置embedGrade为true时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.CourseNotFoundException">未找到该课程时抛出</exception>
-        IList<Seminar> ListSeminarByCourseId(long courseId);
+        Task<IList<Seminar>> ListSeminarByCourseIdAsync(long courseId);
 
 
         /// <summary>
@@ -26,12 +27,12 @@ namespace Xmu.Crms.Shared.Service
         ///     先根据CourseId获得所有的seminar的信息，然后根据seminar信息删除相关topic的记录，然后再根据SeminarId删除SeminarGroup表记录,最后再将seminar的信息删除
         /// </summary>
         /// <param name="courseId">课程Id</param>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarService.ListSeminarByCourseId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ITopicService.DeleteTopicBySeminarId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarGroupService.DeleteSeminarGroupBySeminarId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarService.ListSeminarByCourseIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ITopicService.DeleteTopicBySeminarIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarGroupService.DeleteSeminarGroupBySeminarIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.CourseNotFoundException">该课程不存在时抛出</exception>
-        void DeleteSeminarByCourseId(long courseId);
+        Task DeleteSeminarByCourseIdAsync(long courseId);
 
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Xmu.Crms.Shared.Service
         /// <returns>相应的讨论课信息</returns>
         /// <exception cref="T:System.ArgumentException">格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.CourseNotFoundException">该课程不存在时抛出</exception>
-        Seminar GetSeminarBySeminarId(long seminarId);
+        Task<Seminar> GetSeminarBySeminarIdAsync(long seminarId);
 
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="updated">讨论课信息</param>
         /// <exception cref="T:System.ArgumentException">格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.SeminarNotFoundException">该讨论课不存在时抛出</exception>
-        void UpdateSeminarBySeminarId(long seminarId, Seminar updated);
+        Task UpdateSeminarBySeminarIdAsync(long seminarId, Seminar updated);
 
 
         /// <summary>
@@ -64,11 +65,11 @@ namespace Xmu.Crms.Shared.Service
         ///     用户（老师）通过seminarId删除讨论课(包括删除讨论课包含的topic信息和小组信息).
         /// </summary>
         /// <param name="seminarId">讨论课的id</param>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarGroupService.DeleteSeminarGroupBySeminarId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ITopicService.DeleteTopicBySeminarId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarGroupService.DeleteSeminarGroupBySeminarIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ITopicService.DeleteTopicBySeminarIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.SeminarNotFoundException">该讨论课不存在时抛出</exception>
-        void DeleteSeminarBySeminarId(long seminarId);
+        Task DeleteSeminarBySeminarIdAsync(long seminarId);
 
 
         /// <summary>
@@ -81,6 +82,6 @@ namespace Xmu.Crms.Shared.Service
         /// <returns>seminarId 若创建成功返回创建的讨论课id，失败则返回-1</returns>
         /// <exception cref="T:System.ArgumentException">格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.SeminarNotFoundException">该讨论课不存在时抛出</exception>
-        long InsertSeminarByCourseId(long courseId, Seminar seminar);
+        Task<long> InsertSeminarByCourseIdAsync(long courseId, Seminar seminar);
     }
 }

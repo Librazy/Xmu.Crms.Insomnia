@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Shared.Service
@@ -14,7 +15,7 @@ namespace Xmu.Crms.Shared.Service
         ///     @author zhouzhongjun
         /// </summary>
         /// <param name="topicId">话题Id</param>
-        void DeleteStudentScoreGroupByTopicId(long topicId);
+        Task DeleteStudentScoreGroupByTopicIdAsync(long topicId);
 
         /// <summary>
         ///     获取某学生一堂讨论课信息
@@ -25,7 +26,7 @@ namespace Xmu.Crms.Shared.Service
         /// <returns>seminarGroup 讨论课小组信息（包括成绩）</returns>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.GroupNotFoundException">未找到小组</exception>
-        SeminarGroup GetSeminarGroupBySeminarGroupId(long seminarGroupId);
+        Task<SeminarGroup> GetSeminarGroupBySeminarGroupIdAsync(long seminarGroupId);
 
         /// <summary>
         ///     按课程id获取学生该课程所有讨论课
@@ -36,10 +37,10 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="courseId">课程id</param>
         /// <returns>list 该课程下所有讨论课列表</returns>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarService.ListSeminarByCourseId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarService.ListSeminarByCourseIdAsync(System.Int64)" />
         /// <seealso cref="M:Xmu.Crms.Shared.Service.IGradeService.ListSeminarGradeByUserId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarGroupService.ListSeminarGroupBySeminarId(System.Int64)" />
-        IList<SeminarGroup> ListSeminarGradeByCourseId(long userId, long courseId);
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarGroupService.ListSeminarGroupBySeminarIdAsync(System.Int64)" />
+        Task<IList<SeminarGroup>> ListSeminarGradeByCourseIdAsync(long userId, long courseId);
 
         /// <summary>
         ///     提交对其他小组的打分.
@@ -49,7 +50,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="topicId">话题Id</param>
         /// <param name="groupId">小组Id</param>
         /// <param name="grade">分数</param>
-        void InsertGroupGradeByUserId(long topicId, long userId, long groupId, int grade);
+        Task InsertGroupGradeByUserIdAsync(long topicId, long userId, long groupId, int grade);
 
         /// <summary>
         ///     按ID设置小组报告分.
@@ -57,14 +58,14 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="seminarGroupId">讨论课组id</param>
         /// <param name="grade">分数</param>
-        void UpdateGroupByGroupId(long seminarGroupId, int grade);
+        Task UpdateGroupByGroupIdAsync(long seminarGroupId, int grade);
 
         ///// <summary>
         ///// 获取某学生的讨论课成绩列表.
         ///// @author qinlingyun
         ///// </summary>
         ///// <param name="userId">用户id</param>
-        ///// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarGroupService.ListSeminarGroupBySeminarId(System.Int64)"/>
+        ///// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarGroupService.ListSeminarGroupBySeminarIdAsync(System.Int64)"/>
         //IList<SeminarGroup> ListSeminarGradeByStudentId(long userId);
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="seminarId">讨论课id</param>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
-        void CountPresentationGrade(long seminarId);
+        Task CountPresentationGradeAsync(long seminarId);
 
         /// <summary>
         ///     定时器方法:讨论课结束后计算本次讨论课得分.
@@ -84,6 +85,6 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="seminarId">讨论课id</param>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
-        void CountGroupGradeBySerminarId(long seminarId);
+        Task CountGroupGradeBySerminarIdAsync(long seminarId);
     }
 }

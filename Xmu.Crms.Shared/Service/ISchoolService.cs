@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Shared.Service
@@ -15,7 +16,7 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="city">城市名称</param>
         /// <returns>list 学校列表</returns>
-        IList<School> ListSchoolByCity(string city);
+        Task<IList<School>> ListSchoolByCityAsync(string city);
 
         /// <summary>
         ///     添加学校.
@@ -23,14 +24,14 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="school">学校的信息</param>
         /// <returns>schoolId 学校的id</returns>
-        long InsertSchool(School school);
+        Task<long> InsertSchoolAsync(School school);
 
         /// <summary>
         ///     获取省份列表.
         ///     @author LiuAiqi
         /// </summary>
         /// <returns>list 省份名称列表</returns>
-        IList<string> ListProvince();
+        Task<IList<string>> ListProvinceAsync();
 
         /// <summary>
         ///     获取城市列表.
@@ -38,7 +39,7 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="province">省份名称</param>
         /// <returns>list 城市名称列表</returns>
-        IList<string> ListCity(string province);
+        Task<IList<string>> ListCityAsync(string province);
 
         /// <summary>
         ///     获取学校信息.
@@ -46,6 +47,6 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="schoolId">学校id</param>
         /// <returns>SchoolBO 学校信息</returns>
-        School GetSchoolBySchoolId(long schoolId);
+        Task<School> GetSchoolBySchoolIdAsync(long schoolId);
     }
 }

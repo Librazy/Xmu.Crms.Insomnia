@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,21 +45,21 @@ namespace Xmu.Crms.Insomnia
          */
         [HttpGet("/course")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "TEACHER")]
-        public IActionResult GetUserCourses()
+        public async Task<IActionResult> GetUserCourses()
         {
-            var userlogin = _userService.GetUserByUserId(User.Id());
+            var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
             if (userlogin.Type != Type.Teacher)
             {
                 return StatusCode(403, new {msg = "权限不足"});
             }
 
-            var courses = _courseService.ListCourseByUserId(User.Id());
+            var courses = await _courseService.ListCourseByUserIdAsync(User.Id());
             return Json(courses.Select(c => new
             {
                 id = c.Id,
                 name = c.Name,
-                numClass = _classService.ListClassByCourseId(c.Id).Count,
-                numStudent = _classService.ListClassByCourseId(c.Id).Aggregate(0,
+                numClass = _classService.ListClassByCourseIdAsync(c.Id).Result.Count,
+                numStudent = _classService.ListClassByCourseIdAsync(c.Id).Result.Aggregate(0,
                     (total, cls) => _db.Entry(cls).Collection(cl => cl.CourseSelections).Query().Count() + total),
                 startTime = c.StartDate.ToString("yyyy-MM-dd"),
                 endTime = c.EndDate.ToString("yyyy-MM-dd")
@@ -66,15 +67,15 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPost("/course")]
-        public IActionResult CreateCourse([FromBody] CourseWithProportions newCourse)
+        public async Task<IActionResult> CreateCourse([FromBody] CourseWithProportions newCourse)
         {
-            var userlogin = _userService.GetUserByUserId(User.Id());
+            var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
             if (userlogin.Type != Type.Teacher)
             {
                 return StatusCode(403, new {msg = "权限不足"});
             }
 
-            var id = _courseService.InsertCourseByUserId(User.Id(), new Course
+            var id = _courseService.InsertCourseByUserIdAsync(User.Id(), new Course
             {
                 Name = newCourse.Name,
                 Description = newCourse.Description,
@@ -91,11 +92,11 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/course/{courseId:long}")]
-        public IActionResult GetCourseById([FromRoute] long courseId)
+        public async Task<IActionResult> GetCourseById([FromRoute] long courseId)
         {
             try
             {
-                var course = _courseService.GetCourseByCourseId(courseId);
+                var course = await _courseService.GetCourseByCourseIdAsync(courseId);
                 var result = Json(new
                 {
                     id = course.Id,
@@ -117,14 +118,14 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpDelete("/course/{courseId:long}")]
-        public IActionResult DeleteCourseById([FromRoute] long courseId)
+        public async Task<IActionResult> DeleteCourseById([FromRoute] long courseId)
         {
             try
             {
-                var userlogin = _userService.GetUserByUserId(User.Id());
+                var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
                 if (userlogin.Type == Type.Teacher)
                 {
-                    _courseService.DeleteCourseByCourseId(courseId);
+                    await _courseService.DeleteCourseByCourseIdAsync(courseId);
                     return NoContent();
                 }
 
@@ -141,14 +142,14 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPut("/course/{courseId:long}")]
-        public IActionResult UpdateCourseById([FromRoute] long courseId, [FromBody] Course updated)
+        public async Task<IActionResult> UpdateCourseById([FromRoute] long courseId, [FromBody] Course updated)
         {
             try
             {
-                var userlogin = _userService.GetUserByUserId(User.Id());
+                var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
                 if (userlogin.Type == Type.Teacher)
                 {
-                    _courseService.UpdateCourseByCourseId(courseId, updated);
+                    await _courseService.UpdateCourseByCourseIdAsync(courseId, updated);
                     return NoContent();
                 }
 
@@ -165,11 +166,11 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/course/{courseId:long}/class")]
-        public IActionResult GetClassesByCourseId([FromRoute] long courseId)
+        public async Task<IActionResult> GetClassesByCourseId([FromRoute] long courseId)
         {
             try
             {
-                var classes = _classService.ListClassByCourseId(courseId);
+                var classes = await _classService.ListClassByCourseIdAsync(courseId);
                 return Json(classes.Select(c => new
                 {
                     id = c.Id,
@@ -187,15 +188,15 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPost("/course/{courseId:long}/class")]
-        public IActionResult CreateClassByCourseId([FromRoute] long courseId, [FromBody] ClassWithProportions newClass)
+        public async Task<IActionResult> CreateClassByCourseId([FromRoute] long courseId, [FromBody] ClassWithProportions newClass)
         {
-            var userlogin = _userService.GetUserByUserId(User.Id());
+            var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
             if (userlogin.Type != Type.Teacher)
             {
                 return StatusCode(403, new {msg = "权限不足"});
             }
 
-            var classId = _courseService.InsertClassById(courseId, new ClassInfo
+            var classId = _courseService.InsertClassByIdAsync(courseId, new ClassInfo
             {
                 Name = newClass.Name,
                 ClassTime = newClass.Time,
@@ -213,11 +214,11 @@ namespace Xmu.Crms.Insomnia
          * 这里新增了一个FromBody的embededGrade的参数，用于判断是否已经打分
          */
         [HttpGet("/course/{courseId:long}/seminar")]
-        public IActionResult GetSeminarsByCourseId([FromRoute] long courseId, [FromQuery] bool embededGrade)
+        public async Task<IActionResult> GetSeminarsByCourseId([FromRoute] long courseId, [FromQuery] bool embededGrade)
         {
             try
             {
-                var seminars = _seminarService.ListSeminarByCourseId(courseId);
+                var seminars = await _seminarService.ListSeminarByCourseIdAsync(courseId);
                 if (!embededGrade)
                 {
                     return Json(seminars.Select(s => new
@@ -239,7 +240,7 @@ namespace Xmu.Crms.Insomnia
                     groupingMethod = s.IsFixed == true ? "fixed" : "random",
                     startTime = s.StartTime.ToString("YYYY-MM-dd"),
                     endTime = s.EndTime.ToString("YYYY-MM-dd"),
-                    grade = _seminarGroupService.GetSeminarGroupById(s.Id, User.Id()).FinalGrade
+                    grade = _seminarGroupService.GetSeminarGroupByIdAsync(s.Id, User.Id()).Result.FinalGrade
                 }));
             }
             catch (CourseNotFoundException)
@@ -253,12 +254,12 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPost("/course/{courseId:long}/seminar")]
-        public IActionResult CreateSeminarByCourseId([FromRoute] long courseId, [FromBody] Seminar newSeminar)
+        public async Task<IActionResult> CreateSeminarByCourseId([FromRoute] long courseId, [FromBody] Seminar newSeminar)
         {
-            var userlogin = _userService.GetUserByUserId(User.Id());
+            var userlogin = await _userService.GetUserByUserIdAsync(User.Id());
             if (userlogin.Type == Type.Teacher)
             {
-                var seminarId = _seminarService.InsertSeminarByCourseId(courseId, newSeminar);
+                var seminarId = await _seminarService.InsertSeminarByCourseIdAsync(courseId, newSeminar);
                 return Created($"/seminar/{seminarId}", new {id = seminarId});
             }
 
@@ -271,16 +272,16 @@ namespace Xmu.Crms.Insomnia
          * 已经反馈给模块组，不过也不知道改不改得了了。
          */
         [HttpGet("/course/{courseId:long}/grade")]
-        public IActionResult GetGradeByCourseId([FromRoute] long courseId)
+        public async Task<IActionResult> GetGradeByCourseId([FromRoute] long courseId)
         {
             try
             {
-                var seminarGroups = _seminarGroupService.ListSeminarGroupIdByStudentId(User.Id());
+                var seminarGroups = await _seminarGroupService.ListSeminarGroupIdByStudentIdAsync(User.Id());
                 return Json(seminarGroups.Select(s => new
                 {
-                    seminarName = _seminarService.GetSeminarBySeminarId(s.SeminarId).Name,
+                    seminarName = _seminarService.GetSeminarBySeminarIdAsync(s.SeminarId).Result.Name,
                     groupName = s.Id + "组", //这里还是没有组名的问题
-                    leaderName = _userService.GetUserByUserId(s.LeaderId).Name,
+                    leaderName = _userService.GetUserByUserIdAsync(s.LeaderId).Result.Name,
                     presentationGrade = s.PresentationGrade,
                     reportGrade = s.ReportGrade,
                     grade = s.FinalGrade

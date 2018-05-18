@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
@@ -20,9 +22,9 @@ namespace Xmu.Crms.Services.Insomnia
             throw new NotImplementedException();
 
         /// <inheritdoc />
-        public UserInfo SignInPhone(UserInfo user)
+        public async Task<UserInfo> SignInPhoneAsync(UserInfo user)
         {
-            var userInfo = _db.UserInfo.SingleOrDefault(u => u.Phone == user.Phone) ??
+            var userInfo = await _db.UserInfo.SingleOrDefaultAsync(u => u.Phone == user.Phone) ??
                            throw new UserNotFoundException();
             if (IsExpectedPassword(user.Password, ReadHashString(userInfo.Password)))
             {
@@ -33,7 +35,7 @@ namespace Xmu.Crms.Services.Insomnia
         }
 
         /// <inheritdoc />
-        public UserInfo SignUpPhone(UserInfo user)
+        public async Task<UserInfo> SignUpPhoneAsync(UserInfo user)
         {
             user.Password = HashString(user.Password);
             if (_db.UserInfo.Any(u => u.Phone == user.Phone))
@@ -42,7 +44,7 @@ namespace Xmu.Crms.Services.Insomnia
             }
 
             var entry = _db.UserInfo.Add(user);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return entry.Entity;
         }
 

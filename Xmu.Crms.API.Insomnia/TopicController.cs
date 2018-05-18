@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +24,11 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/topic/{topicId:long}")]
-        public IActionResult GetTopicById([FromRoute] long topicId)
+        public async Task<IActionResult> GetTopicById([FromRoute] long topicId)
         {
             try
             {
-                var t = _topicService.GetTopicByTopicId(topicId);
+                var t = await _topicService.GetTopicByTopicIdAsync(topicId);
                 return Json(new
                 {
                     id = t.Id,
@@ -45,7 +46,7 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpDelete("/topic/{topicId:long}")]
-        public IActionResult DeleteTopicById([FromRoute] long topicId)
+        public async Task<IActionResult> DeleteTopicById([FromRoute] long topicId)
         {
             if (User.Type() != Type.Teacher)
             {
@@ -54,7 +55,7 @@ namespace Xmu.Crms.Insomnia
 
             try
             {
-                _topicService.DeleteTopicByTopicId(topicId);
+                await _topicService.DeleteTopicByTopicIdAsync(topicId);
                 return NoContent();
             }
             catch (TopicNotFoundException)
@@ -64,7 +65,7 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpPut("/topic/{topicId:long}")]
-        public IActionResult UpdateTopicById([FromRoute] long topicId, [FromBody] Topic updated)
+        public async Task<IActionResult> UpdateTopicById([FromRoute] long topicId, [FromBody] Topic updated)
         {
             if (User.Type() != Type.Teacher)
             {
@@ -73,7 +74,7 @@ namespace Xmu.Crms.Insomnia
 
             try
             {
-                _topicService.UpdateTopicByTopicId(topicId, updated);
+                await _topicService.UpdateTopicByTopicIdAsync(topicId, updated);
                 return NoContent();
             }
             catch (TopicNotFoundException)
@@ -83,11 +84,11 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/topic/{topicId:long}/group")]
-        public IActionResult GetGroupsByTopicId([FromRoute] long topicId)
+        public async Task<IActionResult> GetGroupsByTopicId([FromRoute] long topicId)
         {
             try
             {
-                return Json(_seminarGroupService.ListGroupByTopicId(topicId)
+                return Json((await _seminarGroupService.ListGroupByTopicIdAsync(topicId))
                     .Select(s => new {id = s.Id, name = s.Id + "组"}));
             }
             catch (TopicNotFoundException)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
 using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Services.ViceVersa.Daos
@@ -8,14 +9,14 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
     {
         /**
          * 按userId获取与当前用户相关联的课程列表.
-	     * <p>老师与他相关联的课程列表<br> 
+         * <p>老师与他相关联的课程列表<br> 
          * @author ZhouZhongjun
          * @param userId 用户Id
          * @return null 课程列表
          * @exception ArgumentException userId格式错误时抛出
          * @exception CourseNotFoundException 未找到课程
          */
-        List<Course> ListCourseByUserId(long userId);
+        Task<List<Course>> ListCourseByUserIdAsync(long userId);
 
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
         /// <param name="course">课程信息</param>
         /// <returns>courseId 新建课程的id</returns>
         /// <exception cref="T:System.ArgumentException">userId格式错误时抛出</exception>
-        long InsertCourseByUserId(Course course);
+        Task<long> InsertCourseByUserIdAsync(Course course);
 
 
         /**
@@ -37,7 +38,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
          * @exception InfoIllegalException courseId格式错误时抛出
          * @exception CourseNotFoundException 未找到课程
          */
-        Course GetCourseByCourseId(BigInteger courseId);
+        Task<Course> GetCourseByCourseIdAsync(BigInteger courseId);
 
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
         /// </summary>
         /// <param name="courseId">课程Id</param>
         /// <param name="course">课程信息</param>
-        void UpdateCourseByCourseId(long courseId, Course course);
+        Task UpdateCourseByCourseIdAsync(long courseId, Course course);
 
 
         /// <summary>
@@ -54,11 +55,11 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
         ///     @author ZhouZhongjun
         /// </summary>
         /// <param name="courseId">课程Id</param>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarService.DeleteSeminarByCourseId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.DeleteClassByCourseId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ISeminarService.DeleteSeminarByCourseIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.DeleteClassByCourseIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">courseId格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.CourseNotFoundException">未找到课程</exception>
-        void DeleteCourseByCourseId(long courseId);
+        Task DeleteCourseByCourseIdAsync(long courseId);
 
 
         /**
@@ -77,8 +78,8 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
         /// </summary>
         /// <param name="courseName">课程名称</param>
         /// <returns>list 课程列表</returns>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.GetCourseByCourseId(System.Int64)" />
-        List<Course> ListCourseByCourseName(string courseName);
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.GetCourseByCourseIdAsync(System.Int64)" />
+        Task<List<Course>> ListCourseByCourseNameAsync(string courseName);
 
 
         /**
@@ -107,7 +108,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
          * @exception CourseNotFoundException 未找到课程
          * @exception ClassNotFoundException 未找到班级
          */
-        //List<ClassInfo> ListClassByUserId(long userId);
+        //List<ClassInfo> ListClassByUserIdAsync(long userId);
 
         //新增班级
         long Save(ClassInfo t);

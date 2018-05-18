@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
 
@@ -12,9 +14,9 @@ namespace Xmu.Crms.Services.HighGrade
 
         public SchoolService(CrmsContext db) => _db = db;
 
-        public School GetSchoolBySchoolId(long schoolId)
+        public async Task<School> GetSchoolBySchoolIdAsync(long schoolId)
         {
-            var school = _db.School.SingleOrDefault(s => s.Id == schoolId);
+            var school = await _db.School.SingleOrDefaultAsync(s => s.Id == schoolId);
 
             if (school == null)
             {
@@ -24,7 +26,7 @@ namespace Xmu.Crms.Services.HighGrade
             return school;
         }
 
-        public long InsertSchool(School school)
+        public async Task<long> InsertSchoolAsync(School school)
         {
             var s = new School
             {
@@ -34,20 +36,14 @@ namespace Xmu.Crms.Services.HighGrade
                 City = school.City
             };
 
-            var sch = _db.School.Where(sc => sc.Name == s.Name).ToList();
-            if (sch == null)
-            {
-                throw new Exception();
-            }
-
-            _db.School.Add(s);
-            _db.SaveChanges();
+            await _db.School.AddAsync(s);
+            await _db.SaveChangesAsync();
             return s.Id;
         }
 
-        public IList<string> ListCity(string province)
+        public async Task<IList<string>> ListCityAsync(string province)
         {
-            var cities = _db.School.Where(s => s.Province == province).Select(s => s.City).Distinct().ToList();
+            var cities = await _db.School.Where(s => s.Province == province).Select(s => s.City).Distinct().ToListAsync();
 
             if (cities == null)
             {
@@ -57,9 +53,9 @@ namespace Xmu.Crms.Services.HighGrade
             return cities;
         }
 
-        public IList<string> ListProvince()
+        public async Task<IList<string>> ListProvinceAsync()
         {
-            var provinces = _db.School.Select(s => s.Province).Distinct().ToList();
+            var provinces = await _db.School.Select(s => s.Province).Distinct().ToListAsync();
 
             if (provinces == null)
             {
@@ -69,9 +65,9 @@ namespace Xmu.Crms.Services.HighGrade
             return provinces;
         }
 
-        public IList<School> ListSchoolByCity(string city)
+        public async Task<IList<School>> ListSchoolByCityAsync(string city)
         {
-            var schools = _db.School.Where(s => s.City == city).ToList();
+            var schools = await _db.School.Where(s => s.City == city).ToListAsync();
 
             if (schools == null)
             {

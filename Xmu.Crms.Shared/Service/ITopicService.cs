@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Shared.Service
@@ -17,7 +18,7 @@ namespace Xmu.Crms.Shared.Service
         /// <returns>该topic</returns>
         /// <exception cref="T:System.ArgumentException">Id格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.TopicNotFoundException">无此小组或Id错误</exception>
-        Topic GetTopicByTopicId(long topicId);
+        Task<Topic> GetTopicByTopicIdAsync(long topicId);
 
         /// <summary>
         ///     根据topicId修改topic.
@@ -27,14 +28,14 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="topic">修改后的讨论课</param>
         /// <exception cref="T:System.ArgumentException">Id格式错误时抛出</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.TopicNotFoundException">无此小组或Id错误</exception>
-        void UpdateTopicByTopicId(long topicId, Topic topic);
+        Task UpdateTopicByTopicIdAsync(long topicId, Topic topic);
 
         /// <summary>
         ///     删除topic.
         /// </summary>
         /// <param name="topicId">要删除的topic的topicId</param>
         /// <exception cref="T:System.ArgumentException">Id格式错误时抛出</exception>
-        void DeleteTopicByTopicId(long topicId);
+        Task DeleteTopicByTopicIdAsync(long topicId);
 
         /// <summary>
         ///     按seminarId获取Topic.
@@ -43,7 +44,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="seminarId">课程Id</param>
         /// <returns>null</returns>
         /// <exception cref="T:System.ArgumentException">Id格式错误时抛出</exception>
-        IList<Topic> ListTopicBySeminarId(long seminarId);
+        Task<IList<Topic>> ListTopicBySeminarIdAsync(long seminarId);
 
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="topic">话题</param>
         /// <returns>新建话题后给topic分配的Id</returns>
         /// <exception cref="T:System.ArgumentException">Id格式错误时抛出</exception>
-        long InsertTopicBySeminarId(long seminarId, Topic topic);
+        Task<long> InsertTopicBySeminarIdAsync(long seminarId, Topic topic);
 
         /// <summary>
         ///     小组取消选择话题.
@@ -64,7 +65,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="groupId">小组Id</param>
         /// <param name="topicId">话题Id</param>
         /// <exception cref="T:System.ArgumentException">groupId格式错误或topicId格式错误时抛出</exception>
-        void DeleteSeminarGroupTopicById(long groupId, long topicId);
+        Task DeleteSeminarGroupTopicByIdAsync(long groupId, long topicId);
 
         /// <summary>
         ///     按topicId删除SeminarGroupTopic表信息.
@@ -72,7 +73,7 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="topicId">讨论课Id</param>
         /// <exception cref="T:System.ArgumentException">topicId格式错误</exception>
-        void DeleteSeminarGroupTopicByTopicId(long topicId);
+        Task DeleteSeminarGroupTopicByTopicIdAsync(long topicId);
 
         /// <summary>
         ///     按话题id和小组id获取讨论课小组选题信息
@@ -81,7 +82,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="groupId">小组Id</param>
         /// <returns>seminarGroupTopic 讨论课小组选题信息</returns>
         /// <exception cref="T:System.ArgumentException">seminarId格式错误</exception>
-        SeminarGroupTopic GetSeminarGroupTopicById(long topicId, long groupId);
+        Task<SeminarGroupTopic> GetSeminarGroupTopicByIdAsync(long topicId, long groupId);
 
 
         /// 根据小组id获取该小组该堂讨论课所有选题信息
@@ -89,7 +90,7 @@ namespace Xmu.Crms.Shared.Service
         /// @param groupId
         /// @return list 该小组该堂讨论课选题列表
         /// @exception IllegalArgumentException groupId格式错误
-        List<SeminarGroupTopic> ListSeminarGroupTopicByGroupId(long groupId);
+        Task<List<SeminarGroupTopic>> ListSeminarGroupTopicByGroupIdAsync(long groupId);
 
 
         /// <summary>
@@ -98,10 +99,10 @@ namespace Xmu.Crms.Shared.Service
         ///     根据seminarId获得topic信息，然后再根据topic删除seninargrouptopic信息和StudentScoreGroup信息，最后再根据删除topic信息
         /// </summary>
         /// <param name="seminarId">讨论课Id</param>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ITopicService.ListTopicBySeminarId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ITopicService.DeleteSeminarGroupTopicByTopicId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IGradeService.DeleteStudentScoreGroupByTopicId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ITopicService.ListTopicBySeminarIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ITopicService.DeleteSeminarGroupTopicByTopicIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IGradeService.DeleteStudentScoreGroupByTopicIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">seminarId格式错误</exception>
-        void DeleteTopicBySeminarId(long seminarId);
+        Task DeleteTopicBySeminarIdAsync(long seminarId);
     }
 }

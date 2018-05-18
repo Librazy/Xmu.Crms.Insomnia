@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
@@ -15,34 +16,35 @@ namespace Xmu.Crms.Services.Insomnia
         public TopicService(CrmsContext db) => _db = db;
 
         /// <inheritdoc />
-        public Topic GetTopicByTopicId(long topicId) => _db.Topic.Find(topicId) ?? throw new TopicNotFoundException();
+        public async Task<Topic> GetTopicByTopicIdAsync(long topicId) => await _db.Topic.FindAsync(topicId) ?? throw new TopicNotFoundException();
 
         /// <inheritdoc />
-        public void UpdateTopicByTopicId(long topicId, Topic topic)
+        public async Task UpdateTopicByTopicIdAsync(long topicId, Topic topic)
         {
-            var top = GetTopicByTopicId(topicId);
+            var top = await GetTopicByTopicIdAsync(topicId);
             top.Description = topic.Description;
             top.GroupNumberLimit = topic.GroupNumberLimit;
             top.GroupStudentLimit = topic.GroupStudentLimit;
             top.Serial = topic.Serial ?? top.Serial;
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public void DeleteTopicByTopicId(long topicId)
+        public async Task DeleteTopicByTopicIdAsync(long topicId)
         {
-            _db.Remove(GetTopicByTopicId(topicId));
+            _db.Remove(await GetTopicByTopicIdAsync(topicId));
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public IList<Topic> ListTopicBySeminarId(long seminarId)
+        public async Task<IList<Topic>> ListTopicBySeminarIdAsync(long seminarId)
         {
             var sem = _db.Seminar.Find(seminarId) ?? throw new SeminarNotFoundException();
-            return _db.Topic.Include(t => t.Seminar).Where(t => t.Seminar == sem).ToList();
+            return await _db.Topic.Include(t => t.Seminar).Where(t => t.Seminar == sem).ToListAsync();
         }
 
         /// <inheritdoc />
-        public long InsertTopicBySeminarId(long seminarId, Topic topic)
+        public async Task<long> InsertTopicBySeminarIdAsync(long seminarId, Topic topic)
         {
             var sem = _db.Seminar.Find(seminarId) ?? throw new SeminarNotFoundException();
             topic.Seminar = sem;
@@ -51,50 +53,50 @@ namespace Xmu.Crms.Services.Insomnia
                 (byte) (_db.Topic.Count(t => t.SeminarId == seminarId) + Encoding.ASCII.GetBytes("A")[0])
             })[0].ToString();
             var ent = _db.Topic.Add(topic);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return ent.Entity.Id;
         }
 
         /// <inheritdoc />
-        public void DeleteSeminarGroupTopicById(long groupId, long topicId)
+        public async Task DeleteSeminarGroupTopicByIdAsync(long groupId, long topicId)
         {
-            var top = GetTopicByTopicId(topicId);
+            var top = await GetTopicByTopicIdAsync(topicId);
             var grp = _db.SeminarGroup.Find(groupId) ?? throw new GroupNotFoundException();
             _db.SeminarGroupTopic.RemoveRange(_db.SeminarGroupTopic.Include(s => s.Topic).Include(s => s.SeminarGroup)
                 .Where(sg => sg.SeminarGroup == grp && sg.Topic == top));
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public void DeleteSeminarGroupTopicByTopicId(long topicId)
+        public async Task DeleteSeminarGroupTopicByTopicIdAsync(long topicId)
         {
-            var top = GetTopicByTopicId(topicId);
+            var top = await GetTopicByTopicIdAsync(topicId);
             _db.SeminarGroupTopic.RemoveRange(_db.SeminarGroupTopic.Include(s => s.Topic).Where(sg => sg.Topic == top));
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public SeminarGroupTopic GetSeminarGroupTopicById(long topicId, long groupId)
+        public async Task<SeminarGroupTopic> GetSeminarGroupTopicByIdAsync(long topicId, long groupId)
         {
-            var top = GetTopicByTopicId(topicId);
+            var top = await GetTopicByTopicIdAsync(topicId);
             var grp = _db.SeminarGroup.Find(groupId) ?? throw new GroupNotFoundException();
-            return _db.SeminarGroupTopic.Include(s => s.Topic).Include(s => s.SeminarGroup)
-                .SingleOrDefault(sg => sg.SeminarGroup == grp && sg.Topic == top);
+            return await _db.SeminarGroupTopic.Include(s => s.Topic).Include(s => s.SeminarGroup)
+                .SingleOrDefaultAsync(sg => sg.SeminarGroup == grp && sg.Topic == top);
         }
 
         /// <inheritdoc />
-        public List<SeminarGroupTopic> ListSeminarGroupTopicByGroupId(long groupId)
+        public async Task<List<SeminarGroupTopic>> ListSeminarGroupTopicByGroupIdAsync(long groupId)
         {
             var grp = _db.SeminarGroup.Find(groupId) ?? throw new GroupNotFoundException();
-            return _db.SeminarGroupTopic.Include(s => s.Topic).Include(s => s.SeminarGroup)
-                .Where(sg => sg.SeminarGroup == grp).ToList();
+            return await _db.SeminarGroupTopic.Include(s => s.Topic).Include(s => s.SeminarGroup)
+                .Where(sg => sg.SeminarGroup == grp).ToListAsync();
         }
 
         /// <inheritdoc />
-        public void DeleteTopicBySeminarId(long seminarId)
+        public async Task DeleteTopicBySeminarIdAsync(long seminarId)
         {
-            _db.RemoveRange(ListTopicBySeminarId(seminarId));
-            _db.SaveChanges();
+            _db.RemoveRange(ListTopicBySeminarIdAsync(seminarId));
+            await _db.SaveChangesAsync();
         }
     }
 }

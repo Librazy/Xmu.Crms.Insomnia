@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
@@ -13,13 +15,13 @@ namespace Xmu.Crms.Services.ViceVersa
         public ClassDao(CrmsContext db) => _db = db;
 
         //删除班级和学生选课表
-        public void Delete(long id)
+        public async Task DeleteAsync(long id)
         {
             using (var scope = _db.Database.BeginTransaction())
             {
                 try
                 {
-                    var c = _db.ClassInfo.Where(u => u.Id == id).SingleOrDefault();
+                    var c = _db.ClassInfo.SingleOrDefault(u => u.Id == id);
 
                     if (c == null)
                     {
@@ -27,11 +29,11 @@ namespace Xmu.Crms.Services.ViceVersa
                     }
 
                     //根据class信息删除courseSelection表
-                    DeleteSelection(0, c.Id);
+                    await DeleteSelectionAsync(0, c.Id);
 
                     _db.ClassInfo.Attach(c);
                     _db.ClassInfo.Remove(c);
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
                     scope.Commit();
                 }
                 catch (ClassNotFoundException e)
@@ -42,10 +44,10 @@ namespace Xmu.Crms.Services.ViceVersa
             }
         }
 
-        public ClassInfo Get(long id)
+        public async Task<ClassInfo> GetAsync(long id)
         {
-            var classinfo = _db.ClassInfo.Include(u => u.Course).Include(u => u.Course.Teacher).Where(u => u.Id == id)
-                .SingleOrDefault();
+            var classinfo = await _db.ClassInfo.Include(u => u.Course).Include(u => u.Course.Teacher)
+                .SingleOrDefaultAsync(u => u.Id == id);
 
             if (classinfo == null)
             {
@@ -56,18 +58,17 @@ namespace Xmu.Crms.Services.ViceVersa
         }
 
         //根据课程id列出所有班级
-        public List<ClassInfo> QueryAll(long id)
+        public async Task<IList<ClassInfo>> QueryAllAsync(long id)
         {
             //找到这门课
-            var course = _db.Course.SingleOrDefault(u => u.Id == id);
+            var course = await _db.Course.SingleOrDefaultAsync(u => u.Id == id);
             if (course == null)
             {
                 throw new CourseNotFoundException();
             }
 
-            var list = _db.ClassInfo.Include(u => u.Course).Include(u => u.Course.Teacher)
-                .Include(u => u.Course.Teacher.School).Where(u => u.Course.Id == id).ToList();
-            return list;
+            return await _db.ClassInfo.Include(u => u.Course).Include(u => u.Course.Teacher)
+                .Include(u => u.Course.Teacher.School).Where(u => u.Course.Id == id).ToListAsync();
         }
 
         //添加学生选课表返回id
@@ -95,8 +96,8 @@ namespace Xmu.Crms.Services.ViceVersa
         //查询学生选课表的记录
         public int GetSelection(long userId, long classId)
         {
-            var courseSelection = _db.CourseSelection.Where(u => u.ClassInfo.Id == classId && u.Student.Id == userId)
-                .SingleOrDefault();
+            var courseSelection = _db.CourseSelection
+                .SingleOrDefault(u => u.ClassInfo.Id == classId && u.Student.Id == userId);
 
             if (courseSelection != null)
             {
@@ -106,13 +107,13 @@ namespace Xmu.Crms.Services.ViceVersa
             return 0;
         }
 
-        public int Update(ClassInfo t)
+        public async Task UpdateAsync(ClassInfo t)
         {
             using (var scope = _db.Database.BeginTransaction())
             {
                 try
                 {
-                    var c = _db.ClassInfo.Where(u => u.Id == t.Id).SingleOrDefault();
+                    var c = _db.ClassInfo.SingleOrDefault(u => u.Id == t.Id);
 
                     if (c == null)
                     {
@@ -130,21 +131,20 @@ namespace Xmu.Crms.Services.ViceVersa
                     c.ThreePointPercentage = t.ThreePointPercentage;
 
                     _db.Entry(c).State = EntityState.Modified;
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
 
                     scope.Commit();
-                    return 0;
                 }
-                catch (ClassNotFoundException e)
+                catch
                 {
                     scope.Rollback();
-                    throw e;
+                    throw;
                 }
             }
         }
 
         //根据班级id/学生id删除学生选课表
-        public void DeleteSelection(long userId, long classId)
+        public async Task DeleteSelectionAsync(long userId, long classId)
         {
             if (userId != 0) //单个学生取消选课
             {
@@ -157,12 +157,13 @@ namespace Xmu.Crms.Services.ViceVersa
 
                         _db.CourseSelection.Attach(c);
                         _db.CourseSelection.Remove(c);
-                        _db.SaveChanges();
+                        await _db.SaveChangesAsync();
                         scope.Commit();
                     }
                     catch
                     {
                         scope.Rollback();
+                        throw;
                     }
                 }
             }
@@ -176,16 +177,16 @@ namespace Xmu.Crms.Services.ViceVersa
                     _db.CourseSelection.Remove(t);
                 }
 
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
             }
         }
 
         // 根据学生ID获取班级列表
-        public List<ClassInfo> ListClassByUserId(long userId)
+        public async Task<List<ClassInfo>> ListClassByUserIdAsync(long userId)
         {
-            var selectionList = _db.CourseSelection.Include(c => c.Student).Include(c => c.Student.School)
+            var selectionList = await _db.CourseSelection.Include(c => c.Student).Include(c => c.Student.School)
                 .Include(c => c.ClassInfo).Include(c => c.ClassInfo.Course.Teacher.School)
-                .Where(c => c.Student.Id == userId).ToList();
+                .Where(c => c.Student.Id == userId).ToListAsync();
             //找不到对应的选课信息
             if (selectionList == null)
             {
@@ -197,21 +198,21 @@ namespace Xmu.Crms.Services.ViceVersa
 
             foreach (var i in selectionList)
             {
-                classList.Add(Get(i.ClassInfo.Id));
+                classList.Add(await GetAsync(i.ClassInfo.Id));
             }
 
             return classList;
         }
 
         // 老师获取该班级签到、分组状态.
-        public Location GetLocation(long seminarId, long classId)
+        public Task<Location> GetLocation(long seminarId, long classId)
         {
             return _db.Location.Include(u => u.ClassInfo).Include(u => u.Seminar)
-                .SingleOrDefault(u => u.Seminar.Id == seminarId && u.ClassInfo.Id == classId);
+                .SingleOrDefaultAsync(u => u.Seminar.Id == seminarId && u.ClassInfo.Id == classId);
         }
 
         //添加Location表返回id
-        public long InsertLocation(Location t)
+        public async Task<long> InsertLocationAsync(Location t)
         {
             using (var scope = _db.Database.BeginTransaction())
             {
@@ -219,7 +220,7 @@ namespace Xmu.Crms.Services.ViceVersa
                 {
                     _db.Location.Add(t);
 
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
 
                     scope.Commit();
                     return t.Id;
@@ -233,14 +234,14 @@ namespace Xmu.Crms.Services.ViceVersa
         }
 
         //结束签到时修改location
-        public int UpdateLocation(long seminarId, long classId)
+        public async Task<int> UpdateLocationAsync(long seminarId, long classId)
         {
             using (var scope = _db.Database.BeginTransaction())
             {
                 try
                 {
-                    var location = _db.Location.Include(u => u.Seminar).Include(u => u.ClassInfo)
-                        .SingleOrDefault(u => u.ClassInfo.Id == classId && u.Seminar.Id == seminarId);
+                    var location = await _db.Location.Include(u => u.Seminar).Include(u => u.ClassInfo)
+                        .SingleOrDefaultAsync(u => u.ClassInfo.Id == classId && u.Seminar.Id == seminarId);
                     //没有记录
                     if (location == null)
                     {
@@ -249,7 +250,7 @@ namespace Xmu.Crms.Services.ViceVersa
 
                     location.Status = 0;
                     _db.Entry(location).State = EntityState.Modified;
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
 
                     scope.Commit();
                     return 0;

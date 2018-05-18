@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
@@ -15,9 +16,9 @@ namespace Xmu.Crms.Insomnia
         public SchoolController(ISchoolService schoolService) => _schoolService = schoolService;
 
         [HttpGet("/school")]
-        public IActionResult GetSchools([FromQuery] string city)
+        public async Task<IActionResult> GetSchools([FromQuery] string city)
         {
-            var schools = _schoolService.ListSchoolByCity(city);
+            var schools = await _schoolService.ListSchoolByCityAsync(city);
             return Json(schools.Select(t => new
             {
                 id = t.Id,
@@ -28,11 +29,11 @@ namespace Xmu.Crms.Insomnia
         }
 
         [HttpGet("/school/{schoolId:long}")]
-        public IActionResult GetSchoolById([FromRoute] long schoolId)
+        public async Task<IActionResult> GetSchoolById([FromRoute] long schoolId)
         {
             try
             {
-                var schoolinfo = _schoolService.GetSchoolBySchoolId(schoolId);
+                var schoolinfo = await _schoolService.GetSchoolBySchoolIdAsync(schoolId);
                 return Json(new {name = schoolinfo.Name, province = schoolinfo.Province, city = schoolinfo.City});
             }
             catch (ArgumentException)
@@ -46,9 +47,9 @@ namespace Xmu.Crms.Insomnia
          * 这里school的查找有问题
          */
         [HttpPost("/school")]
-        public IActionResult CreateSchool([FromBody] School newSchool)
+        public async Task<IActionResult> CreateSchool([FromBody] School newSchool)
         {
-            var schoolId = _schoolService.InsertSchool(newSchool);
+            var schoolId = await _schoolService.InsertSchoolAsync(newSchool);
             return Created("/school/" + schoolId, newSchool);
         }
     }

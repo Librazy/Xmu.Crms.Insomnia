@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
@@ -14,7 +15,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
         // 在构造函数里添加依赖的Service（参考模块标准组的类图）
         public GradeDao(CrmsContext db) => _db = db;
 
-        public void DeleteStudentScoreGroupByTopicId(long topicId)
+        public async Task DeleteStudentScoreGroupByTopicIdAsync(long topicId)
         {
             using (var scope = _db.Database.BeginTransaction())
             {
@@ -22,8 +23,8 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
                 {
                     //查找到所有的seminarGroupTopic
                     //查找到所有的studentScoreGroup//.AsNoTracking()
-                    var seminarGroupTopicList = _db.SeminarGroupTopic.Include(u => u.Topic)
-                        .Where(u => u.Topic.Id == topicId).ToList();
+                    var seminarGroupTopicList = await _db.SeminarGroupTopic.Include(u => u.Topic)
+                        .Where(u => u.Topic.Id == topicId).ToListAsync();
                     if (seminarGroupTopicList == null)
                     {
                         throw new GroupNotFoundException();
@@ -31,8 +32,8 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
 
                     foreach (var seminarGroupTopic in seminarGroupTopicList)
                     {
-                        var studentScoreGroupList = _db.StudentScoreGroup.Include(u => u.SeminarGroupTopic)
-                            .Where(u => u.SeminarGroupTopic.Id == seminarGroupTopic.Id).ToList();
+                        var studentScoreGroupList = await _db.StudentScoreGroup.Include(u => u.SeminarGroupTopic)
+                            .Where(u => u.SeminarGroupTopic.Id == seminarGroupTopic.Id).ToListAsync();
                         foreach (var studentScoreGroup in studentScoreGroupList)
                         {
                             //将实体附加到对象管理器中
@@ -42,7 +43,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
                         }
                     }
 
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
                 }
                 catch
                 {
@@ -52,29 +53,22 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
             }
         }
 
-        public SeminarGroup GetSeminarGroupBySeminarGroupId(long seminarGroupId)
+        public async Task<SeminarGroup> GetSeminarGroupBySeminarGroupIdAsync(long seminarGroupId)
         {
-            try
+            var group = await _db.SeminarGroup.SingleOrDefaultAsync(c => c.Id == seminarGroupId);
+            if (group == null)
             {
-                var group = _db.SeminarGroup.SingleOrDefault(c => c.Id == seminarGroupId);
-                if (group == null)
-                {
-                    throw new GroupNotFoundException();
-                }
+                throw new GroupNotFoundException();
+            }
 
-                return group;
-            }
-            catch
-            {
-                throw;
-            }
+            return group;
         }
 
         //不用写，调用其他的
         public List<SeminarGroup> ListSeminarGradeByCourseId(long userId, long courseId) => null;
 
         //先在seminarGroupTopic 和userinfo service查好，在这里传入实体对象seminarGroupTopic，userInfo
-        public void InsertGroupGradeByUserId(SeminarGroupTopic seminarGroupTopic, UserInfo userInfo, int grade)
+        public async Task InsertGroupGradeByUserIdAsync(SeminarGroupTopic seminarGroupTopic, UserInfo userInfo, int grade)
         {
             using (var scope = _db.Database.BeginTransaction())
             {
@@ -87,7 +81,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
                         Grade = grade
                     };
                     _db.StudentScoreGroup.Add(ssg);
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
                 }
                 catch
                 {
@@ -97,13 +91,13 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
             }
         }
 
-        public void UpdateGroupByGroupId(long seminarGroupId, int grade)
+        public async Task UpdateGroupByGroupIdAsync(long seminarGroupId, int grade)
         {
-            using (var scope = _db.Database.BeginTransaction())
+            using (var scope = await _db.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    var seminarGroup = _db.SeminarGroup.SingleOrDefault(s => s.Id == seminarGroupId);
+                    var seminarGroup = await _db.SeminarGroup.SingleOrDefaultAsync(s => s.Id == seminarGroupId);
                     //如果找不到该组
                     if (seminarGroup == null)
                     {
@@ -112,7 +106,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
 
                     //更新报告分
                     seminarGroup.ReportGrade = grade;
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
                 }
                 catch
                 {
@@ -122,17 +116,17 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
             }
         }
 
-        //在SeminarGroupService调用 IList<SeminarGroup> ListSeminarGroupIdByStudentId(long userId);
+        //在SeminarGroupService调用 IList<SeminarGroup> ListSeminarGroupIdByStudentIdAsync(long userId);
         public List<SeminarGroup> ListSeminarGradeByStudentId(long userId) => null;
 
         //只需要讨论课ID，因为要排序，必须要一起计算
-        public void CountPresentationGrade(long seminarId, IList<Topic> topicList)
+        public async Task CountPresentationGradeAsync(long seminarId, IList<Topic> topicList)
         {
-            using (var scope = _db.Database.BeginTransaction())
+            using (var scope = await _db.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    CalculatePreGradeByTopicId(seminarId, topicList); //计算每个小组每个topic得分
+                    await CalculatePreGradeByTopicIdAsync(seminarId, topicList); //计算每个小组每个topic得分
                 }
                 catch
                 {
@@ -142,9 +136,9 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
             }
         }
 
-        public void CountGroupGradeBySerminarId(long seminarId, IList<SeminarGroup> seminarGroupList)
+        public async Task CountGroupGradeBySerminarIdAsync(long seminarId, IList<SeminarGroup> seminarGroupList)
         {
-            using (var scope = _db.Database.BeginTransaction())
+            using (var scope = await _db.Database.BeginTransactionAsync())
             {
                 //根据seminarGroupList中元素，依次计算
                 //SeminarGroup实体中保存了ClassInfo实体对象，可以查到成绩计算方法
@@ -153,18 +147,14 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
                 foreach (var seminarGroup in seminarGroupList)
                 {
                     //根据seminarGroupId获得seminarGroupTopicList,计算每一个seminarGroup的展示分数
-                    var seminarGroupTopicList = _db.SeminarGroupTopic.Include(u => u.SeminarGroup)
-                        .Where(u => u.SeminarGroup.Id == seminarGroup.Id).ToList();
-                    if (seminarGroupTopicList == null) //该组没有展示分数
-                    {
-                        seminarGroupList.Remove(seminarGroup);
-                    }
+                    var seminarGroupTopicList = await _db.SeminarGroupTopic.Include(u => u.SeminarGroup)
+                        .Where(u => u.SeminarGroup.Id == seminarGroup.Id).ToListAsync();
 
-                    int? grade = 0;
+                    int grade = 0;
                     var number = 0;
                     foreach (var seminarGroupTopic in seminarGroupTopicList)
                     {
-                        grade += seminarGroupTopic.PresentationGrade;
+                        grade += seminarGroupTopic.PresentationGrade ?? 0;
                         number++;
                     }
 
@@ -174,7 +164,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
                         var avgPreGrade = grade / number;
                         _db.SeminarGroup.Attach(seminarGroup);
                         seminarGroup.PresentationGrade = avgPreGrade;
-                        _db.SaveChanges();
+                        await _db.SaveChangesAsync();
                     }
                     catch
                     {
@@ -213,7 +203,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
                         //seminarGroupList[i].FinalGrade = 3;
                         //_db.SaveChanges();
 
-                        var seminarGroup = _db.SeminarGroup.SingleOrDefault(s => s.Id == tempId[i]);
+                        var seminarGroup = await _db.SeminarGroup.SingleOrDefaultAsync(s => s.Id == tempId[i]);
                         //如果找不到该组
                         if (seminarGroup == null)
                         {
@@ -222,7 +212,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
 
                         //更新报告分
                         seminarGroup.FinalGrade = 5;
-                        _db.SaveChanges();
+                        await _db.SaveChangesAsync();
                     }
                     catch
                     {
@@ -235,7 +225,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
                 {
                     try
                     {
-                        var seminarGroup = _db.SeminarGroup.SingleOrDefault(s => s.Id == tempId[i]);
+                        var seminarGroup = await _db.SeminarGroup.SingleOrDefaultAsync(s => s.Id == tempId[i]);
                         //如果找不到该组
                         if (seminarGroup == null)
                         {
@@ -244,7 +234,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
 
                         //更新报告分
                         seminarGroup.FinalGrade = 4;
-                        _db.SaveChanges();
+                        await _db.SaveChangesAsync();
                     }
                     catch
                     {
@@ -257,7 +247,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
                 {
                     try
                     {
-                        var seminarGroup = _db.SeminarGroup.SingleOrDefault(s => s.Id == tempId[i]);
+                        var seminarGroup = await _db.SeminarGroup.SingleOrDefaultAsync(s => s.Id == tempId[i]);
                         //如果找不到该组
                         if (seminarGroup == null)
                         {
@@ -266,7 +256,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
 
                         //更新报告分
                         seminarGroup.FinalGrade = 3;
-                        _db.SaveChanges();
+                        await _db.SaveChangesAsync();
                     }
                     catch
                     {
@@ -331,7 +321,7 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
             QuickSort(idList, gradeList, i + 1, high);
         }
 
-        public void CalculatePreGradeByTopicId(long seminarId, IList<Topic> topicList)
+        public async Task CalculatePreGradeByTopicIdAsync(long seminarId, IList<Topic> topicList)
         {
             foreach (var topic in topicList)
             {
@@ -341,139 +331,105 @@ namespace Xmu.Crms.Services.ViceVersa.Daos
                 double[] gradeList;
 
                 //获取选择该topic的所有小组
-                var seminarGroupTopicList = _db.SeminarGroupTopic.Include(u => u.SeminarGroup).Include(u => u.Topic)
-                    .Where(u => u.Topic.Id == topic.Id).ToList();
+                var seminarGroupTopicList = await _db.SeminarGroupTopic.Include(u => u.SeminarGroup)
+                    .Include(u => u.Topic)
+                    .Where(u => u.Topic.Id == topic.Id).ToListAsync();
                 if (seminarGroupTopicList == null)
                 {
                     throw new GroupNotFoundException();
                 }
 
-                if (seminarGroupTopicList != null)
+                idList = new long[seminarGroupTopicList.Count];
+                gradeList = new double[seminarGroupTopicList.Count];
+
+                var groupNumber = 0;
+
+                //计算一个小组的所有学生打分情况
+                foreach (var i in seminarGroupTopicList)
                 {
-                    idList = new long[seminarGroupTopicList.Count];
-                    gradeList = new double[seminarGroupTopicList.Count];
+                    //List<StudentScoreGroup> studentScoreList = new List<StudentScoreGroup>();
+                    //获取学生打分列表
+                    var studentScoreList =
+                        await _db.StudentScoreGroup.Where(u => u.SeminarGroupTopic.Id == i.Id).ToListAsync();
 
-                    var groupNumber = 0;
-
-                    //计算一个小组的所有学生打分情况
-                    foreach (var i in seminarGroupTopicList)
+                    int? grade = 0;
+                    var k = 0;
+                    foreach (var g in studentScoreList)
                     {
-                        //List<StudentScoreGroup> studentScoreList = new List<StudentScoreGroup>();
-                        //获取学生打分列表
-                        var studentScoreList =
-                            _db.StudentScoreGroup.Where(u => u.SeminarGroupTopic.Id == i.Id).ToList();
-                        if (studentScoreList == null) //该组没有被打分
-                        {
-                            seminarGroupTopicList.Remove(i);
-                        }
-
-                        int? grade = 0;
-                        var k = 0;
-                        foreach (var g in studentScoreList)
-                        {
-                            grade += g.Grade;
-                            k++;
-                        }
-
-                        var avg = (double) grade / k;
-
-                        //将小组该讨论课平均分和Id保存
-                        idList[groupNumber] = i.Id;
-                        gradeList[groupNumber] = avg;
-                        groupNumber++;
+                        grade += g.Grade??0;
+                        k++;
                     }
 
-                    //将小组成绩从大到小排序
-                    QuickSort(idList, gradeList, 0, groupNumber - 1);
+                    var avg = (double) grade / k;
 
-                    Seminar seminar;
-                    ClassInfo classInfo;
-                    try
+                    //将小组该讨论课平均分和Id保存
+                    idList[groupNumber] = i.Id;
+                    gradeList[groupNumber] = avg;
+                    groupNumber++;
+                }
+
+                //将小组成绩从大到小排序
+                QuickSort(idList, gradeList, 0, groupNumber - 1);
+
+                Seminar seminar;
+                ClassInfo classInfo;
+                seminar = await _db.Seminar.Include(u => u.Course).SingleOrDefaultAsync(u => u.Id == seminarId);
+                if (seminar == null)
+                {
+                    throw new SeminarNotFoundException();
+                }
+
+                classInfo = await _db.ClassInfo.Where(u => u.Id == seminar.Course.Id).SingleOrDefaultAsync();
+                if (classInfo == null)
+                {
+                    throw new ClassNotFoundException();
+                }
+
+                //各小组按比例给分
+                var A = Convert.ToInt32(groupNumber * classInfo.FivePointPercentage * 0.01);
+                var B = Convert.ToInt32(groupNumber * classInfo.FourPointPercentage * 0.01);
+                var C = Convert.ToInt32(groupNumber * classInfo.ThreePointPercentage * 0.01);
+                for (var i = 0; i < A; i++)
+                {
+                    var seminarGroupTopic = await _db.SeminarGroupTopic.SingleOrDefaultAsync(s => s.Id == idList[i]);
+                    //如果找不到该组
+                    if (seminarGroupTopic == null)
                     {
-                        seminar = _db.Seminar.Include(u => u.Course).Where(u => u.Id == seminarId).SingleOrDefault();
-                        if (seminar == null)
-                        {
-                            throw new SeminarNotFoundException();
-                        }
-
-                        classInfo = _db.ClassInfo.Where(u => u.Id == seminar.Course.Id).SingleOrDefault();
-                        if (classInfo == null)
-                        {
-                            throw new ClassNotFoundException();
-                        }
-                    }
-                    catch
-                    {
-                        throw;
-                    }
-
-                    //各小组按比例给分
-                    var A = Convert.ToInt32(groupNumber * classInfo.FivePointPercentage * 0.01);
-                    var B = Convert.ToInt32(groupNumber * classInfo.FourPointPercentage * 0.01);
-                    var C = Convert.ToInt32(groupNumber * classInfo.ThreePointPercentage * 0.01);
-                    for (var i = 0; i < A; i++)
-                    {
-                        try
-                        {
-                            var seminarGroupTopic = _db.SeminarGroupTopic.SingleOrDefault(s => s.Id == idList[i]);
-                            //如果找不到该组
-                            if (seminarGroupTopic == null)
-                            {
-                                throw new GroupNotFoundException();
-                            }
-
-                            //更新报告分
-                            seminarGroupTopic.PresentationGrade = 5;
-                            _db.SaveChanges();
-                        }
-                        catch
-                        {
-                            throw;
-                        }
+                        throw new GroupNotFoundException();
                     }
 
-                    for (var i = A; i < B; i++)
-                    {
-                        try
-                        {
-                            var seminarGroupTopic = _db.SeminarGroupTopic.SingleOrDefault(s => s.Id == idList[i]);
-                            //如果找不到该组
-                            if (seminarGroupTopic == null)
-                            {
-                                throw new GroupNotFoundException();
-                            }
+                    //更新报告分
+                    seminarGroupTopic.PresentationGrade = 5;
+                    await _db.SaveChangesAsync();
+                }
 
-                            //更新报告分
-                            seminarGroupTopic.PresentationGrade = 4;
-                            _db.SaveChanges();
-                        }
-                        catch
-                        {
-                            throw;
-                        }
+                for (var i = A; i < B; i++)
+                {
+                    var seminarGroupTopic = await _db.SeminarGroupTopic.SingleOrDefaultAsync(s => s.Id == idList[i]);
+                    //如果找不到该组
+                    if (seminarGroupTopic == null)
+                    {
+                        throw new GroupNotFoundException();
                     }
 
-                    for (var i = B; i < groupNumber; i++)
-                    {
-                        try
-                        {
-                            var seminarGroupTopic = _db.SeminarGroupTopic.SingleOrDefault(s => s.Id == idList[i]);
-                            //如果找不到该组
-                            if (seminarGroupTopic == null)
-                            {
-                                throw new GroupNotFoundException();
-                            }
+                    //更新报告分
+                    seminarGroupTopic.PresentationGrade = 4;
+                    await _db.SaveChangesAsync();
+                }
 
-                            //更新报告分
-                            seminarGroupTopic.PresentationGrade = 3;
-                            _db.SaveChanges();
-                        }
-                        catch
-                        {
-                            throw;
-                        }
+                for (var i = B; i < groupNumber; i++)
+                {
+                    var seminarGroupTopic = await _db.SeminarGroupTopic.SingleOrDefaultAsync(s => s.Id == idList[i]);
+                    //如果找不到该组
+                    if (seminarGroupTopic == null)
+                    {
+                        throw new GroupNotFoundException();
                     }
-                } //if end
+
+                    //更新报告分
+                    seminarGroupTopic.PresentationGrade = 3;
+                    await _db.SaveChangesAsync();
+                }
             } //foreach topic end
         }
     }

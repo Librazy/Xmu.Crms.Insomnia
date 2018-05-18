@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Services.ViceVersa
@@ -6,16 +7,16 @@ namespace Xmu.Crms.Services.ViceVersa
     internal interface IClassDao
     {
         long InsertSelection(CourseSelection t);
-        long InsertLocation(Location t);
-        void Delete(long id);
-        void DeleteSelection(long userId, long classId);
-        int Update(ClassInfo t);
-        int UpdateLocation(long seminarId, long classId);
-        List<ClassInfo> QueryAll(long id);
-        ClassInfo Get(long id);
+        Task<long> InsertLocationAsync(Location t);
+        Task DeleteAsync(long id);
+        Task DeleteSelectionAsync(long userId, long classId);
+        Task UpdateAsync(ClassInfo t);
+        Task<int> UpdateLocationAsync(long seminarId, long classId);
+        Task<IList<ClassInfo>> QueryAllAsync(long id);
+        Task<ClassInfo> GetAsync(long id);
         int GetSelection(long userId, long classId);
 
-        Location GetLocation(long seminarId, long classId);
+        Task<Location> GetLocation(long seminarId, long classId);
 
         /**
          * 根据学生ID获取班级列表.  
@@ -29,6 +30,6 @@ namespace Xmu.Crms.Services.ViceVersa
          * @exception CourseNotFoundException 未找到课程
          * @exception ClassNotFoundException 未找到班级
          */
-        List<ClassInfo> ListClassByUserId(long userId);
+        Task<List<ClassInfo>> ListClassByUserIdAsync(long userId);
     }
 }

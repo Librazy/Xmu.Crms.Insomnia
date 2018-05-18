@@ -1,4 +1,5 @@
-﻿using Xmu.Crms.Shared.Models;
+﻿using System.Threading.Tasks;
+using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Shared.Service
 {
@@ -27,7 +28,7 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="user">用户信息(手机号Phone和密码Password)</param>
         /// <returns>user 该用户信息</returns>
-        UserInfo SignInPhone(UserInfo user);
+        Task<UserInfo> SignInPhoneAsync(UserInfo user);
 
         /// <summary>
         ///     手机号注册.
@@ -36,7 +37,7 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="user">用户信息(手机号Phone和密码Password)</param>
         /// <returns>user 该用户信息</returns>
-        UserInfo SignUpPhone(UserInfo user);
+        Task<UserInfo> SignUpPhoneAsync(UserInfo user);
 
 
         /// <summary>
@@ -45,8 +46,8 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="userId">用户id</param>
         /// <returns>true 解绑成功 false 解绑失败</returns>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListCourseByUserId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.DeleteCourseByCourseId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.ListCourseByUserIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.DeleteCourseByCourseIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.UserNotFoundException">未找到对应用户</exception>
         void DeleteTeacherAccount(long userId);
@@ -58,7 +59,7 @@ namespace Xmu.Crms.Shared.Service
         /// </summary>
         /// <param name="userId">用户id</param>
         /// <returns>true 解绑成功 false 解绑失败</returns>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.DeleteCourseSelectionById(System.Int64,System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.DeleteCourseSelectionByIdAsync(System.Int64,System.Int64)" />
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.UserNotFoundException">未找到对应用户</exception>
         void DeleteStudentAccount(long userId);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
@@ -15,14 +16,14 @@ namespace Xmu.Crms.Services.Insomnia
         public GroupService(CrmsContext db) => _db = db;
 
         /// <inheritdoc />
-        public void DeleteSeminarGroupMemberBySeminarGroupId(long seminarGroupId)
+        public async Task DeleteSeminarGroupMemberBySeminarGroupIdAsync(long seminarGroupId)
         {
             _db.RemoveRange(_db.SeminarGroupMember.Where(s => s.SeminarGroup.Id == seminarGroupId));
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public long InsertSeminarGroupMemberById(long userId, long groupId)
+        public async Task<long> InsertSeminarGroupMemberByIdAsync(long userId, long groupId)
         {
             if (userId < 0 && groupId < 0)
             {
@@ -54,61 +55,61 @@ namespace Xmu.Crms.Services.Insomnia
                 SeminarGroup = group,
                 Student = student
             });
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return seminargroup.Entity.Id;
         }
 
         /// <inheritdoc />
-        public IList<UserInfo> ListSeminarGroupMemberByGroupId(long groupId)
+        public async Task<IList<UserInfo>> ListSeminarGroupMemberByGroupIdAsync(long groupId)
         {
             if (groupId < 0)
             {
                 throw new ArgumentException();
             }
 
-            var group = _db.SeminarGroup.SingleOrDefault(s => s.Id == groupId);
+            var group = await _db.SeminarGroup.SingleOrDefaultAsync(s => s.Id == groupId);
             if (group == null)
             {
                 throw new GroupNotFoundException();
             }
 
-            return _db.SeminarGroupMember
+            return await _db.SeminarGroupMember
                 .Include(s => s.Student)
                 .Include(s => s.SeminarGroup)
                 .Where(s => s.SeminarGroup.Id == groupId)
                 .Select(s => s.Student)
-                .ToList();
+                .ToListAsync();
         }
 
         /// <inheritdoc />
-        public IList<SeminarGroup> ListSeminarGroupIdByStudentId(long userId)
+        public async Task<IList<SeminarGroup>> ListSeminarGroupIdByStudentIdAsync(long userId)
         {
             if (userId < 0)
             {
                 throw new ArgumentException();
             }
 
-            var user = _db.SeminarGroup.SingleOrDefault(u => u.Id == userId);
+            var user = await _db.SeminarGroup.SingleOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
                 throw new GroupNotFoundException();
             }
 
-            return _db.SeminarGroupMember.Include(s => s.Student).Include(s => s.SeminarGroup)
+            return await _db.SeminarGroupMember.Include(s => s.Student).Include(s => s.SeminarGroup)
                 .Where(s => s.Student.Id == userId)
-                .Select(s => s.SeminarGroup).ToList();
+                .Select(s => s.SeminarGroup).ToListAsync();
         }
 
         /// <inheritdoc />
-        public long GetSeminarGroupLeaderByGroupId(long groupId)
+        public async Task<long> GetSeminarGroupLeaderByGroupIdAsync(long groupId)
         {
             if (groupId < 0)
             {
                 throw new ArgumentException();
             }
 
-            var group = _db.SeminarGroup.Include(s => s.Leader).SingleOrDefault(s => s.Id == groupId);
+            var group = await _db.SeminarGroup.Include(s => s.Leader).SingleOrDefaultAsync(s => s.Id == groupId);
             if (group == null)
             {
                 throw new GroupNotFoundException();
@@ -118,7 +119,7 @@ namespace Xmu.Crms.Services.Insomnia
         }
 
         /// <inheritdoc />
-        public IList<SeminarGroup> ListSeminarGroupBySeminarId(long seminarId)
+        public async Task<IList<SeminarGroup>> ListSeminarGroupBySeminarIdAsync(long seminarId)
         {
             if (seminarId < 0)
             {
@@ -126,11 +127,11 @@ namespace Xmu.Crms.Services.Insomnia
             }
 
             var seminar = _db.Seminar.Find(seminarId) ?? throw new SeminarNotFoundException();
-            return _db.SeminarGroup.Include(s => s.Seminar).Where(s => s.SeminarId == seminar.Id).ToList();
+            return await _db.SeminarGroup.Include(s => s.Seminar).Where(s => s.SeminarId == seminar.Id).ToListAsync();
         }
 
         /// <inheritdoc />
-        public void DeleteSeminarGroupBySeminarId(long seminarId)
+        public async Task DeleteSeminarGroupBySeminarIdAsync(long seminarId)
         {
             if (seminarId < 0)
             {
@@ -138,28 +139,28 @@ namespace Xmu.Crms.Services.Insomnia
             }
 
             _db.SeminarGroup.RemoveRange(_db.SeminarGroup.Where(s => s.Seminar.Id == seminarId));
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public long InsertSeminarGroupBySeminarId(long seminarId, long classId, SeminarGroup seminarGroup)
+        public async Task<long> InsertSeminarGroupBySeminarIdAsync(long seminarId, long classId, SeminarGroup seminarGroup)
         {
             if (seminarId < 0)
             {
                 throw new ArgumentException();
             }
 
-            var seminarinfo = _db.Seminar.Find(seminarId) ?? throw new SeminarNotFoundException();
-            var classinfo = _db.ClassInfo.Find(classId) ?? throw new ClassNotFoundException();
+            var seminarinfo = await _db.Seminar.FindAsync(seminarId) ?? throw new SeminarNotFoundException();
+            var classinfo = await _db.ClassInfo.FindAsync(classId) ?? throw new ClassNotFoundException();
             seminarGroup.Seminar = seminarinfo;
             seminarGroup.ClassInfo = classinfo;
-            var group = _db.SeminarGroup.Add(seminarGroup);
-            _db.SaveChanges();
+            var group = await _db.SeminarGroup.AddAsync(seminarGroup);
+            await _db.SaveChangesAsync();
             return group.Entity.Id;
         }
 
         /// <inheritdoc />
-        public long InsertSeminarGroupMemberByGroupId(long groupId, SeminarGroupMember seminarGroupMember)
+        public async Task<long> InsertSeminarGroupMemberByGroupIdAsync(long groupId, SeminarGroupMember seminarGroupMember)
         {
             if (groupId < 0)
             {
@@ -169,12 +170,12 @@ namespace Xmu.Crms.Services.Insomnia
             var group = _db.SeminarGroup.Find(groupId);
             seminarGroupMember.SeminarGroup = group;
             var member = _db.SeminarGroupMember.Add(seminarGroupMember);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return member.Entity.Id;
         }
 
         /// <inheritdoc />
-        public void DeleteSeminarGroupByGroupId(long seminarGroupId)
+        public async Task DeleteSeminarGroupByGroupIdAsync(long seminarGroupId)
         {
             if (seminarGroupId < 0)
             {
@@ -182,18 +183,18 @@ namespace Xmu.Crms.Services.Insomnia
             }
 
             _db.SeminarGroup.RemoveRange(_db.SeminarGroup.Where(s => s.Id == seminarGroupId));
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public SeminarGroup GetSeminarGroupByGroupId(long groupId)
+        public async Task<SeminarGroup> GetSeminarGroupByGroupIdAsync(long groupId)
         {
             if (groupId < 0)
             {
                 throw new ArgumentException();
             }
 
-            var group = _db.SeminarGroup.Find(groupId);
+            var group = await _db.SeminarGroup.FindAsync(groupId);
             if (group == null)
             {
                 throw new GroupNotFoundException();
@@ -203,19 +204,19 @@ namespace Xmu.Crms.Services.Insomnia
         }
 
         /// <inheritdoc />
-        public long GetSeminarGroupLeaderById(long userId, long seminarId)
+        public async Task<long> GetSeminarGroupLeaderByIdAsync(long userId, long seminarId)
         {
             if (userId < 0 || seminarId < 0)
             {
                 throw new ArgumentException();
             }
 
-            var seminarmember = _db.SeminarGroupMember
+            var seminarmember = await _db.SeminarGroupMember
                 .Include(s => s.Student)
                 .Include(s => s.SeminarGroup)
                 .ThenInclude(sem => sem.Seminar)
                 .Where(s => s.Student.Id == userId)
-                .SingleOrDefault(sg => sg.SeminarGroup.Seminar.Id == seminarId);
+                .SingleOrDefaultAsync(sg => sg.SeminarGroup.Seminar.Id == seminarId);
             if (seminarmember != null)
             {
                 return seminarmember.SeminarGroup.Leader.Id;
@@ -225,7 +226,7 @@ namespace Xmu.Crms.Services.Insomnia
         }
 
         /// <inheritdoc />
-        public void AutomaticallyGrouping(long seminarId, long classId)
+        public async Task AutomaticallyGroupingAsync(long seminarId, long classId)
         {
             if (seminarId < 0 || classId < 0)
             {
@@ -285,32 +286,32 @@ namespace Xmu.Crms.Services.Insomnia
                 }
             }
 
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public SeminarGroup GetSeminarGroupById(long seminarId, long userId)
+        public async Task<SeminarGroup> GetSeminarGroupByIdAsync(long seminarId, long userId)
         {
             if (userId < 0 || seminarId < 0)
             {
                 throw new ArgumentException();
             }
 
-            var seminar = _db.Seminar.Find(seminarId);
+            var seminar = await _db.Seminar.FindAsync(seminarId);
             if (seminar == null)
             {
                 throw new SeminarNotFoundException();
             }
 
-            var user = _db.UserInfo.Find(userId);
+            var user = await _db.UserInfo.FindAsync(userId);
             if (user == null)
             {
                 throw new UserNotFoundException();
             }
 
-            var seminarmember = _db.SeminarGroupMember.Include(s => s.Student).Include(s => s.SeminarGroup)
+            var seminarmember = await _db.SeminarGroupMember.Include(s => s.Student).Include(s => s.SeminarGroup)
                 .ThenInclude(sem => sem.Seminar).Where(s => s.Student == user)
-                .SingleOrDefault(sg => sg.SeminarGroup.Seminar == seminar);
+                .SingleOrDefaultAsync(sg => sg.SeminarGroup.Seminar == seminar);
             if (seminarmember == null)
             {
                 throw new InvalidOperationException();
@@ -320,22 +321,22 @@ namespace Xmu.Crms.Services.Insomnia
         }
 
         /// <inheritdoc />
-        public IList<SeminarGroup> ListGroupByTopicId(long topicId)
+        public async Task<IList<SeminarGroup>> ListGroupByTopicIdAsync(long topicId)
         {
             if (topicId < 0)
             {
                 throw new ArgumentException();
             }
 
-            _db.SaveChanges();
-            return _db.SeminarGroupTopic.Include(s => s.Topic).Include(s => s.SeminarGroup)
+            await _db.SaveChangesAsync();
+            return await _db.SeminarGroupTopic.Include(s => s.Topic).Include(s => s.SeminarGroup)
                 .Where(s => s.Topic.Id == topicId)
                 .Select(sg => sg.SeminarGroup)
-                .ToList();
+                .ToListAsync();
         }
 
         /// <inheritdoc />
-        public string InsertTopicByGroupId(long groupId, long topicId)
+        public async Task InsertTopicByGroupIdAsync(long groupId, long topicId)
         {
             if (groupId < 0 || topicId < 0)
             {
@@ -354,12 +355,11 @@ namespace Xmu.Crms.Services.Insomnia
                 Topic = topic,
                 SeminarGroup = group
             });
-            _db.SaveChanges();
-            return null;
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public void AssignLeaderById(long groupId, long userId)
+        public async Task AssignLeaderByIdAsync(long groupId, long userId)
         {
             if (groupId < 0 || userId < 0)
             {
@@ -367,7 +367,7 @@ namespace Xmu.Crms.Services.Insomnia
             }
 
             var user = _db.UserInfo.Find(userId) ?? throw new UserNotFoundException();
-            var group = _db.SeminarGroup.Include(s => s.Leader).SingleOrDefault(s => s.Id == groupId) ??
+            var group = await _db.SeminarGroup.Include(s => s.Leader).SingleOrDefaultAsync(s => s.Id == groupId) ??
                         throw new GroupNotFoundException();
             if (group.Leader != null)
             {
@@ -375,11 +375,11 @@ namespace Xmu.Crms.Services.Insomnia
             }
 
             group.Leader = user;
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public void ResignLeaderById(long groupId, long userId)
+        public async Task ResignLeaderByIdAsync(long groupId, long userId)
         {
             if (groupId < 0 || userId < 0)
             {
@@ -404,7 +404,7 @@ namespace Xmu.Crms.Services.Insomnia
             }
 
             group.Leader = null;
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
     }
 }

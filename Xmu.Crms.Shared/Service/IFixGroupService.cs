@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Shared.Service
@@ -14,7 +15,7 @@ namespace Xmu.Crms.Shared.Service
         /// <returns>若创建成功返回该条记录的id，失败则返回-1</returns>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.ClassNotFoundException">未找到班级</exception>
-        long InsertFixGroupByClassId(long classId, long userId);
+        Task<long> InsertFixGroupByClassIdAsync(long classId, long userId);
 
         /// <summary>
         ///     按FixGroupId删除FixGroupMember.
@@ -23,7 +24,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="fixGroupId">固定分组Id</param>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.FixGroupNotFoundException">未找到小组</exception>
-        void DeleteFixGroupMemberByFixGroupId(long fixGroupId);
+        Task DeleteFixGroupMemberByFixGroupIdAsync(long fixGroupId);
 
 
         /// <summary>
@@ -34,7 +35,7 @@ namespace Xmu.Crms.Shared.Service
         /// <returns>List 固定小组成员信息</returns>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.FixGroupNotFoundException">未找到小组</exception>
-        IList<UserInfo> ListFixGroupMemberByGroupId(long groupId);
+        Task<IList<UserInfo>> ListFixGroupMemberByGroupIdAsync(long groupId);
 
         /// <summary>
         ///     按classId查找FixGroup信息.
@@ -43,7 +44,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="classId">班级Id</param>
         /// <returns>null 固定分组列表</returns>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
-        IList<FixGroup> ListFixGroupByClassId(long classId);
+        Task<IList<FixGroup>> ListFixGroupByClassIdAsync(long classId);
 
         /// <summary>
         ///     按classId删除FixGroup
@@ -51,21 +52,21 @@ namespace Xmu.Crms.Shared.Service
         ///     先根据classId得到所有的FixGroup信息，再根据FixGroupid删除FixGroupMember表的信息，最后再将FixGroup信息删除
         /// </summary>
         /// <param name="classId">班级Id</param>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IFixGroupService.ListFixGroupByClassId(System.Int64)" />
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IFixGroupService.DeleteFixGroupByGroupId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IFixGroupService.ListFixGroupByClassIdAsync(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IFixGroupService.DeleteFixGroupByGroupIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.ClassNotFoundException">未找到班级</exception>
-        void DeleteFixGroupByClassId(long classId);
+        Task DeleteFixGroupByClassIdAsync(long classId);
 
         /// <summary>
         ///     删除固定小组.
         ///     @author YeHongjie
         /// </summary>
         /// <param name="groupId">固定小组的id</param>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IFixGroupService.DeleteFixGroupMemberByFixGroupId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IFixGroupService.DeleteFixGroupMemberByFixGroupIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.FixGroupNotFoundException">未找到小组</exception>
-        void DeleteFixGroupByGroupId(long groupId);
+        Task DeleteFixGroupByGroupIdAsync(long groupId);
 
         /// <summary>
         ///     修改固定小组.
@@ -76,7 +77,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="fixGroupBo">小组信息</param>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.FixGroupNotFoundException">未找到小组</exception>
-        void UpdateFixGroupByGroupId(long groupId, FixGroup fixGroupBo);
+        Task UpdateFixGroupByGroupIdAsync(long groupId, FixGroup fixGroupBo);
 
 
         /// <summary>
@@ -91,7 +92,7 @@ namespace Xmu.Crms.Shared.Service
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.FixGroupNotFoundException">未找到小组</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.UserNotFoundException">不存在该学生</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.InvalidOperationException">待添加学生已经在小组里了</exception>
-        long InsertStudentIntoGroup(long userId, long groupId);
+        Task<long> InsertStudentIntoGroupAsync(long userId, long groupId);
 
         /// <summary>
         ///     按id获取小组.
@@ -101,11 +102,11 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="userId">学生id</param>
         /// <param name="classId">班级id</param>
         /// <returns>GroupBO 返回班级固定小组的信息</returns>
-        /// <seealso cref="M:Xmu.Crms.Shared.Service.IUserService.GetUserByUserId(System.Int64)" />
+        /// <seealso cref="M:Xmu.Crms.Shared.Service.IUserService.GetUserByUserIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.ClassNotFoundException">未找到班级</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.UserNotFoundException">不存在该学生</exception>
-        FixGroup GetFixedGroupById(long userId, long classId);
+        Task<FixGroup> GetFixedGroupByIdAsync(long userId, long classId);
 
         /// <summary>
         ///     按FixGroupId和UserId删除FixGroupMember中某个学生.
@@ -116,7 +117,7 @@ namespace Xmu.Crms.Shared.Service
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.FixGroupNotFoundException">未找到小组</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.UserNotFoundException">不存在该学生</exception>
-        void DeleteFixGroupUserById(long fixGroupId, long userId);
+        Task DeleteFixGroupUserByIdAsync(long fixGroupId, long userId);
 
         /// <summary>
         ///     按照id查询某一固定小组的信息（包括成员）
@@ -125,6 +126,6 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="groupId">小组的id</param>
         /// <returns>List 固定小组成员列表对象，若未找到相关成员返回空(null)</returns>
         /// <seealso cref="M:Xmu.Crms.Shared.Service.IFixGroupService.listFixGroupMemberByGroupId(System.Int64)" />
-        IList<FixGroupMember> ListFixGroupByGroupId(long groupId);
+        Task<IList<FixGroupMember>> ListFixGroupByGroupIdAsync(long groupId);
     }
 }

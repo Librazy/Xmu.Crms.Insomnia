@@ -199,7 +199,7 @@ namespace Xmu.Crms.Shared
                 //$env:ASPNETCORE_ENVIRONMENT="Production"
                 _connString = _configuration.GetConnectionString("MYSQL57");
                 services.AddDbContextPool<CrmsContext>(options =>
-                    options.UseMySql(_connString)
+                    options.UseMySQL(_connString)
                 );
             }
 

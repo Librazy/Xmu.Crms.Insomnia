@@ -124,6 +124,7 @@ namespace Xmu.Crms.Insomnia
         {
             return WebHost.CreateDefaultBuilder(args)
                 .UseIISIntegration()
+                .UseKestrel()
                 .ConfigureServices(collection =>
                 {
                     collection

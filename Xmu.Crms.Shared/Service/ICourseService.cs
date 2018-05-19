@@ -8,7 +8,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author YeXiaona ZhouZhongjun CaoXingmei
     ///     @version 2.00
     /// </summary>
-    public interface ICourseService
+    public interface ICourseService : Orleans.IGrainWithGuidKey
     {
         /// <summary>
         ///     新建班级.

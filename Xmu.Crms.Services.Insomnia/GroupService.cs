@@ -9,7 +9,7 @@ using Xmu.Crms.Shared.Service;
 
 namespace Xmu.Crms.Services.Insomnia
 {
-    public class GroupService : ISeminarGroupService
+    public class GroupService : Orleans.Grain, ISeminarGroupService
     {
         private readonly CrmsContext _db;
 

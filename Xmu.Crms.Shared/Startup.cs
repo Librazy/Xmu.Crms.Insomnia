@@ -228,7 +228,6 @@ namespace Xmu.Crms.Shared
             // MVC
             services
                 .AddMvc()
-                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(
                     option =>
                     {
@@ -264,15 +263,11 @@ namespace Xmu.Crms.Shared
             }
             else
             {
-                app.UseHttpsRedirection();
-
                 app.UseStaticFiles();
 
                 app.UseAuthentication();
 
                 app.UseMvc();
-
-                app.UseHsts();
             }
         }
     }

@@ -8,7 +8,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author Aixing ZhouZhongjun
     ///     @version 2.00
     /// </summary>
-    public interface ITopicService
+    public interface ITopicService : Orleans.IGrainWithGuidKey
     {
         /// <summary>
         ///     按topicId获取topic.

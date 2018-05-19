@@ -7,7 +7,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author ModuleStandardGroup/YeHongjie
     ///     @version 2.00
     /// </summary>
-    public interface ILoginService
+    public interface ILoginService : Orleans.IGrainWithGuidKey
     {
         /// <summary>
         ///     微信登录.
@@ -18,7 +18,7 @@ namespace Xmu.Crms.Shared.Service
         /// <param name="state">微信OAuth2授权的state。对于小程序，值恒为 MiniProgram</param>
         /// <param name="successUrl">微信OAuth2授权后跳转到的网址</param>
         /// <returns>user 该用户信息</returns>
-        UserInfo SignInWeChat(long userId, string code, string state, string successUrl);
+        Task<UserInfo> SignInWeChatAsync(long userId, string code, string state, string successUrl);
 
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Xmu.Crms.Shared.Service
         /// <seealso cref="M:Xmu.Crms.Shared.Service.ICourseService.DeleteCourseByCourseIdAsync(System.Int64)" />
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.UserNotFoundException">未找到对应用户</exception>
-        void DeleteTeacherAccount(long userId);
+        Task DeleteTeacherAccountAsync(long userId);
 
 
         /// <summary>
@@ -62,6 +62,6 @@ namespace Xmu.Crms.Shared.Service
         /// <seealso cref="M:Xmu.Crms.Shared.Service.IClassService.DeleteCourseSelectionByIdAsync(System.Int64,System.Int64)" />
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.UserNotFoundException">未找到对应用户</exception>
-        void DeleteStudentAccount(long userId);
+        Task DeleteStudentAccountAsync(long userId);
     }
 }

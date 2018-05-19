@@ -11,7 +11,7 @@ using Type = Xmu.Crms.Shared.Models.Type;
 
 namespace Xmu.Crms.Services.Insomnia
 {
-    public class Md5LoginService : ILoginService
+    public class Md5LoginService : Orleans.Grain, ILoginService
     {
         private readonly CrmsContext _db;
 
@@ -19,7 +19,7 @@ namespace Xmu.Crms.Services.Insomnia
 
         // .Net 平台不需要实现
         /// <inheritdoc />
-        public UserInfo SignInWeChat(long userId, string code, string state, string successUrl) =>
+        public Task<UserInfo> SignInWeChatAsync(long userId, string code, string state, string successUrl) =>
             throw new NotImplementedException();
 
         /// <inheritdoc />
@@ -53,11 +53,11 @@ namespace Xmu.Crms.Services.Insomnia
 
         // .Net 平台不需要实现
         /// <inheritdoc />
-        public void DeleteTeacherAccount(long userId) => throw new NotImplementedException();
+        public Task DeleteTeacherAccountAsync(long userId) => throw new NotImplementedException();
 
         // .Net 平台不需要实现
         /// <inheritdoc />
-        public void DeleteStudentAccount(long userId) => throw new NotImplementedException();
+        public Task DeleteStudentAccountAsync(long userId) => throw new NotImplementedException();
 
         private static string GetMd5(string strPwd)
         {

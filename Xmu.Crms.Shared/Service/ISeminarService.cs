@@ -8,7 +8,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author zhouzhongjun CaoXingmei YeHongjie
     ///     @version 2.00
     /// </summary>
-    public interface ISeminarService
+    public interface ISeminarService : Orleans.IGrainWithGuidKey
     {
         /// <summary>
         ///     按courseId获取Seminar.

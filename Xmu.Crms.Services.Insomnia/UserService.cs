@@ -10,7 +10,7 @@ using Type = Xmu.Crms.Shared.Models.Type;
 
 namespace Xmu.Crms.Services.Insomnia
 {
-    public class UserService : IUserService
+    public class UserService : Orleans.Grain, IUserService
     {
         private readonly CrmsContext _db;
 

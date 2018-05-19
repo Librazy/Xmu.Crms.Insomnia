@@ -1,6 +1,8 @@
-﻿namespace Xmu.Crms.Shared.Service
+﻿using System.Threading.Tasks;
+
+namespace Xmu.Crms.Shared.Service
 {
-    internal interface IUploadService
+    internal interface IUploadService : Orleans.IGrainWithGuidKey
     {
         /// <summary>
         ///     上传选课名单
@@ -8,7 +10,7 @@
         /// </summary>
         /// <param name="classId">班级Id</param>
         /// <param name="pathName">文件路径</param>
-        void UploadRoster(long classId, string pathName);
+        Task UploadRoster(long classId, string pathName);
 
         /// <summary>
         ///     上传小组报告
@@ -16,7 +18,7 @@
         /// </summary>
         /// <param name="seminaId">讨论课Id</param>
         /// <param name="pathName">文件路径</param>
-        void UploadReport(long seminaId, string pathName);
+        Task UploadReport(long seminaId, string pathName);
 
         /// <summary>
         ///     上传用户头像名单
@@ -24,6 +26,6 @@
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="pathName">文件路径</param>
-        void UploadAvater(long userId, string pathName);
+        Task UploadAvater(long userId, string pathName);
     }
 }

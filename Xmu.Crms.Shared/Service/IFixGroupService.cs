@@ -4,7 +4,7 @@ using Xmu.Crms.Shared.Models;
 
 namespace Xmu.Crms.Shared.Service
 {
-    public interface IFixGroupService
+    public interface IFixGroupService : Orleans.IGrainWithGuidKey
     {
         /// <summary>
         ///     按班级Id添加固定分组.

@@ -8,7 +8,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author Huhui QinLingyun ZhouZhongjun
     ///     @version 2.00
     /// </summary>
-    public interface IGradeService
+    public interface IGradeService : Orleans.IGrainWithGuidKey
     {
         /// <summary>
         ///     按topicId删除学生打分表.

@@ -8,7 +8,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author YeHongjie
     ///     @version 2.00
     /// </summary>
-    public interface IUserService
+    public interface IUserService : Orleans.IGrainWithGuidKey
     {
         /// <summary>
         ///     添加学生签到信息.

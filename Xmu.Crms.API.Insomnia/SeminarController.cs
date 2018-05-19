@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Orleans;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
@@ -23,13 +24,12 @@ namespace Xmu.Crms.Insomnia
         private readonly ITopicService _topicService;
         private readonly IUserService _userService;
 
-        public SeminarController(ISeminarService seminarService, ITopicService topicService,
-            ISeminarGroupService seminargroupService, IUserService userService, CrmsContext db)
+        public SeminarController(IClusterClient client, CrmsContext db)
         {
-            _seminarService = seminarService;
-            _topicService = topicService;
-            _seminargroupService = seminargroupService;
-            _userService = userService;
+            _seminarService = client.GetGrain<ISeminarService>(0);
+            _topicService = client.GetGrain<ITopicService>(0);
+            _seminargroupService = client.GetGrain<ISeminarGroupService>(0);
+            _userService = client.GetGrain<IUserService>(0);
             _db = db;
         }
 

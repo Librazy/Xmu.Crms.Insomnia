@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Orleans.Concurrency;
 using Xmu.Crms.Services.ViceVersa.Daos;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
@@ -9,7 +10,8 @@ using Type = Xmu.Crms.Shared.Models.Type;
 
 namespace Xmu.Crms.Services.ViceVersa.Services
 {
-    internal class CourseService : ICourseService
+    [StatelessWorker]
+    internal class CourseService : Orleans.Grain, ICourseService
     {
         private readonly IClassService _iClassService;
         private readonly ICourseDao _iCourseDao;

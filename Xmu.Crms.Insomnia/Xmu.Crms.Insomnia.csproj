@@ -12,14 +12,15 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Transport.Libuv" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Orleans.Client" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Xmu.Crms.API.Insomnia\Xmu.Crms.API.Insomnia.csproj" />
-    <ProjectReference Include="..\Xmu.Crms.Services.HighGrade\Xmu.Crms.Services.HighGrade.csproj" />
-    <ProjectReference Include="..\Xmu.Crms.Services.Insomnia\Xmu.Crms.Services.Insomnia.csproj" />
-    <ProjectReference Include="..\Xmu.Crms.Services.ViceVersa\Xmu.Crms.Services.ViceVersa.csproj" />
     <ProjectReference Include="..\Xmu.Crms.Shared\Xmu.Crms.Shared.csproj" />
   </ItemGroup>
   

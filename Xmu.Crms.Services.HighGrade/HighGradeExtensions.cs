@@ -3,7 +3,7 @@ using Xmu.Crms.Shared.Service;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class InsomniaExtensions
+    public static class HighGradeExtensions
     {
         public static IServiceCollection AddHighGradeSeminarService(this IServiceCollection serviceCollection) =>
             serviceCollection.AddScoped<ISeminarService, SeminarService>();

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Xmu.Crms.Services.HighGrade\Xmu.Crms.Services.HighGrade.csproj" />
+    <ProjectReference Include="..\Xmu.Crms.Services.Insomnia\Xmu.Crms.Services.Insomnia.csproj" />
+    <ProjectReference Include="..\Xmu.Crms.Services.ViceVersa\Xmu.Crms.Services.ViceVersa.csproj" />
+    <ProjectReference Include="..\Xmu.Crms.Shared\Xmu.Crms.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

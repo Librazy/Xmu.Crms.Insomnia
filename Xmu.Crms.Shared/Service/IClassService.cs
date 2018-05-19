@@ -8,7 +8,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author YeXiaona,ZhouZhongJun
     ///     @version 2.00
     /// </summary>
-    public interface IClassService : Orleans.IGrainWithGuidKey
+    public interface IClassService : Orleans.IGrainWithIntegerKey
     {
         /// <summary>
         ///     按classId删除CourseSelection表的一条记录.

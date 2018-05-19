@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Orleans;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
@@ -24,16 +25,14 @@ namespace Xmu.Crms.Insomnia
         private readonly ISeminarService _seminarService;
         private readonly IUserService _userService;
 
-        public ClassController(CrmsContext db, ICourseService courseService, IClassService classService,
-            IUserService userService, IFixGroupService fixGroupService,
-            ISeminarService seminarService)
+        public ClassController(CrmsContext db, IClusterClient client)
         {
             _db = db;
-            _courseService = courseService;
-            _classService = classService;
-            _userService = userService;
-            _fixGroupService = fixGroupService;
-            _seminarService = seminarService;
+            _courseService = client.GetGrain<ICourseService>(0);
+            _classService = client.GetGrain<IClassService>(0);
+            _userService = client.GetGrain<IUserService>(0);
+            _fixGroupService = client.GetGrain<IFixGroupService>(0);
+            _seminarService = client.GetGrain<ISeminarService>(0);
         }
 
         [HttpGet("/class")]

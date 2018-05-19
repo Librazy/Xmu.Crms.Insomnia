@@ -8,7 +8,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author qinlingyun liuaiqi
     ///     @version 2.00
     /// </summary>
-    public interface ITimerService : Orleans.IGrainWithGuidKey
+    public interface ITimerService : Orleans.IGrainWithIntegerKey
     {
         /// <summary>
         ///     向Event表插入数据.

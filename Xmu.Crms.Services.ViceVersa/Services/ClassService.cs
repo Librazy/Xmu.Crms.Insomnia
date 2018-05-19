@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Orleans.Concurrency;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
 
 namespace Xmu.Crms.Services.ViceVersa
 {
-    internal class ClassService : IClassService
+    [StatelessWorker]
+    internal class ClassService : Orleans.Grain, IClassService
     {
         private readonly IClassDao _classDao;
         private readonly IFixGroupService _fixGroupService;

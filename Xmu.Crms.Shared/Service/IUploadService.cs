@@ -2,7 +2,7 @@
 
 namespace Xmu.Crms.Shared.Service
 {
-    internal interface IUploadService : Orleans.IGrainWithGuidKey
+    internal interface IUploadService : Orleans.IGrainWithIntegerKey
     {
         /// <summary>
         ///     上传选课名单

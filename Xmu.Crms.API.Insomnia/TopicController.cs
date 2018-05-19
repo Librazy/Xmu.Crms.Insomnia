@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Orleans;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
@@ -17,10 +18,10 @@ namespace Xmu.Crms.Insomnia
         private readonly ISeminarGroupService _seminarGroupService;
         private readonly ITopicService _topicService;
 
-        public TopicController(ITopicService topicService, ISeminarGroupService seminarGroupService)
+        public TopicController(IClusterClient client)
         {
-            _topicService = topicService;
-            _seminarGroupService = seminarGroupService;
+            _topicService = client.GetGrain<ITopicService>(0);
+            _seminarGroupService = client.GetGrain<ISeminarGroupService>(0);
         }
 
         [HttpGet("/topic/{topicId:long}")]

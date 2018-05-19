@@ -15,10 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Services.ViceVersa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xmu.Crms.Services.HighGrade", "Xmu.Crms.Services.HighGrade\Xmu.Crms.Services.HighGrade.csproj", "{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xmu.Crms.Silo.Insomnia", "Xmu.Crms.Silo.Insomnia\Xmu.Crms.Silo.Insomnia.csproj", "{9192034B-7E85-4EBB-8DFC-CF2E1E09A1DD}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9FC95330-BC31-4523-A874-49D0CE6ECF7B} = {9FC95330-BC31-4523-A874-49D0CE6ECF7B}
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xmu.Crms.Silo", "Xmu.Crms.Silo\Xmu.Crms.Silo.csproj", "{9DD47D9D-3787-482C-A7B1-591D084970DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,10 +47,10 @@ Global
 		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1985BE5E-BACE-4671-A18A-FC04C6EEC3A8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9192034B-7E85-4EBB-8DFC-CF2E1E09A1DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9192034B-7E85-4EBB-8DFC-CF2E1E09A1DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9192034B-7E85-4EBB-8DFC-CF2E1E09A1DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9192034B-7E85-4EBB-8DFC-CF2E1E09A1DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DD47D9D-3787-482C-A7B1-591D084970DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DD47D9D-3787-482C-A7B1-591D084970DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DD47D9D-3787-482C-A7B1-591D084970DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DD47D9D-3787-482C-A7B1-591D084970DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

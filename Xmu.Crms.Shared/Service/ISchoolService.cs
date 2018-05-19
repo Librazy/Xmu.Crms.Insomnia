@@ -8,7 +8,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author LiuAiqi
     ///     @version 2.00
     /// </summary>
-    public interface ISchoolService : Orleans.IGrainWithGuidKey
+    public interface ISchoolService : Orleans.IGrainWithIntegerKey
     {
         /// <summary>
         ///     按城市名称查学校.

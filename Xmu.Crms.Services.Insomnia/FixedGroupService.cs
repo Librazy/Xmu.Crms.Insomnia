@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Orleans.Concurrency;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
 
 namespace Xmu.Crms.Services.Insomnia
 {
+    [StatelessWorker]
     public class FixedGroupService : Orleans.Grain, IFixGroupService
     {
         private readonly CrmsContext _db;

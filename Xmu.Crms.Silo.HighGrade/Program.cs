@@ -2,15 +2,16 @@
 using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Xmu.Crms.Shared.Models;
 
-namespace Xmu.Crms.Silo.Insomnia
+namespace Xmu.Crms.Silo.HighGrade
 {
-
     public class Program
     {
         private static ISiloHost _silo;
@@ -19,14 +20,17 @@ namespace Xmu.Crms.Silo.Insomnia
         private static void Main()
         {
             _silo = new SiloHostBuilder()
-                .UseLocalhostClustering(11111, 30000, null, "silo-insomnia")
+                .UseLocalhostClustering(11111, 30000, null, "silo-highgrade")
                 .Configure<ClusterOptions>(options =>
                 {
-                    options.ClusterId = "silo-insomnia";
-                    options.ServiceId = "insomnia";
+                    options.ClusterId = "silo-highgrade";
+                    options.ServiceId = "highgrade";
                 })
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(InsomniaExtensions).Assembly).WithReferences())
-                .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Warning).AddConsole())
+                .ConfigureServices(svc => svc.AddDbContextPool<CrmsContext>(options =>
+                    options.UseMySQL("Server=localhost;Database=crmsdb;Uid=root;Pwd=root;SslMode=none")
+                ))
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(HighGradeExtensions).Assembly).WithReferences())
+                .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Information).AddConsole())
                 .Build();
 
             Task.Run(StartSilo);
@@ -54,3 +58,4 @@ namespace Xmu.Crms.Silo.Insomnia
         }
     }
 }
+

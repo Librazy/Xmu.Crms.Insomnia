@@ -8,7 +8,7 @@ using Xmu.Crms.Shared.Service;
 
 namespace Xmu.Crms.Services.HighGrade
 {
-    public class SchoolService : ISchoolService
+    public class SchoolService : Orleans.Grain, ISchoolService
     {
         private readonly CrmsContext _db;
 

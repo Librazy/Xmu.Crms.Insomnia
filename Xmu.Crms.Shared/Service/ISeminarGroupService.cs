@@ -8,7 +8,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author ModuleStandardGroup/zhouzhongjun
     ///     @version 2.00
     /// </summary>
-    public interface ISeminarGroupService : Orleans.IGrainWithGuidKey
+    public interface ISeminarGroupService : Orleans.IGrainWithIntegerKey
     {
         /// <summary>
         ///     按seminarGroupId删除SeminarGroupMember信息.

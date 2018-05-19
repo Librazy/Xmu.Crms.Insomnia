@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Orleans.Concurrency;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
@@ -10,6 +11,7 @@ using Type = Xmu.Crms.Shared.Models.Type;
 
 namespace Xmu.Crms.Services.Insomnia
 {
+    [StatelessWorker]
     public class UserService : Orleans.Grain, IUserService
     {
         private readonly CrmsContext _db;

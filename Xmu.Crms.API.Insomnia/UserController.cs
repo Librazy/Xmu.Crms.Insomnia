@@ -2,11 +2,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Orleans;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
@@ -23,13 +23,12 @@ namespace Xmu.Crms.Insomnia
         private readonly ISchoolService _schoolService;
         private readonly IUserService _userService;
 
-        public UserController(JwtHeader header, ILoginService loginService, IUserService userService,
-            ISchoolService schoolService)
+        public UserController(JwtHeader header, IClusterClient client)
         {
             _header = header;
-            _loginService = loginService;
-            _userService = userService;
-            _schoolService = schoolService;
+            _userService = client.GetGrain<IUserService>(0);
+            _loginService = client.GetGrain<ILoginService>(0);
+            _schoolService = client.GetGrain<ISchoolService>(0);
         }
 
         [HttpGet("/me")]
@@ -73,7 +72,7 @@ namespace Xmu.Crms.Insomnia
             try
             {
                 var user = await _loginService.SignInPhoneAsync(new UserInfo {Phone = uap.Phone, Password = uap.Password});
-                await HttpContext.SignInAsync(JwtBearerDefaults.AuthenticationScheme, new ClaimsPrincipal());
+                //await HttpContext.SignInAsync(JwtBearerDefaults.AuthenticationScheme, new ClaimsPrincipal());
                 return Json(CreateSigninResult(user));
             }
             catch (PasswordErrorException)

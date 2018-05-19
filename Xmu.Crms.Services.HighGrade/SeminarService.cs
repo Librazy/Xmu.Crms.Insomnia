@@ -9,7 +9,7 @@ using Xmu.Crms.Shared.Service;
 
 namespace Xmu.Crms.Services.HighGrade
 {
-    public class SeminarService : ISeminarService
+    public class SeminarService : Orleans.Grain, ISeminarService
     {
         private readonly CrmsContext _db;
         public SeminarService(CrmsContext db)

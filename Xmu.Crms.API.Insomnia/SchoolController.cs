@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Orleans;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
 
@@ -13,7 +14,7 @@ namespace Xmu.Crms.Insomnia
     {
         private readonly ISchoolService _schoolService;
 
-        public SchoolController(ISchoolService schoolService) => _schoolService = schoolService;
+        public SchoolController(IClusterClient client) => _schoolService = client.GetGrain<ISchoolService>(0);
 
         [HttpGet("/school")]
         public async Task<IActionResult> GetSchools([FromQuery] string city)

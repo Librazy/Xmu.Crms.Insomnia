@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -237,7 +236,6 @@ namespace Xmu.Crms.Shared
                 )
                 .AddApplicationParts(_startupConfig.ControllerAssemblies)
                 .AddControllersAsServices();
-
             // 定时任务
             services.AddScheduler();
 

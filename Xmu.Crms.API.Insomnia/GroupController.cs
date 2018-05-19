@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Orleans;
 using Xmu.Crms.Shared.Exceptions;
 using Xmu.Crms.Shared.Models;
 using Xmu.Crms.Shared.Service;
@@ -24,19 +25,13 @@ namespace Xmu.Crms.Insomnia
         private readonly ITopicService _topicService;
 
         public GroupController(
-            ICourseService courseService,
-            IClassService classService,
-            IFixGroupService fixGroupService,
-            ISeminarGroupService seminarGroupService,
-            ITopicService topicService,
-            ISeminarService seminarService,
-            IGradeService gradeService,
+            IClusterClient client,
             JwtHeader header)
         {
-            _fixGroupService = fixGroupService;
-            _seminarGroupService = seminarGroupService;
-            _topicService = topicService;
-            _gradeService = gradeService;
+            _fixGroupService = client.GetGrain<IFixGroupService>(0);
+            _seminarGroupService = client.GetGrain<ISeminarGroupService>(0);
+            _topicService = client.GetGrain<ITopicService>(0);
+            _gradeService = client.GetGrain<IGradeService>(0);
         }
 
         [HttpGet("/group/{groupId:long}")]

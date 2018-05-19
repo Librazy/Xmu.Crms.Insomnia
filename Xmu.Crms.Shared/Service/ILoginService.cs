@@ -7,7 +7,7 @@ namespace Xmu.Crms.Shared.Service
     ///     @author ModuleStandardGroup/YeHongjie
     ///     @version 2.00
     /// </summary>
-    public interface ILoginService : Orleans.IGrainWithGuidKey
+    public interface ILoginService : Orleans.IGrainWithIntegerKey
     {
         /// <summary>
         ///     微信登录.

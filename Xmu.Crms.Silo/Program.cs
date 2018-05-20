@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,12 +23,17 @@ namespace Xmu.Crms.Silo
         private static void Main()
         {
             _silo = new SiloHostBuilder()
-                .UseLocalhostClustering(11111, 30000, null, "xmu.crms.silo")
+                .UseAdoNetClustering(options =>
+                {
+                    options.Invariant = "MySql.Data.MySqlClient";
+                    options.ConnectionString = "Server=localhost;Database=crmsdb;Uid=root;Pwd=root;SslMode=none";
+                })
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "xmu.crms.silo";
                     options.ServiceId = "xmu.crms.silo.services";
                 })
+                .ConfigureEndpoints(GetLocalIpAddress(), 11111, 30000)
                 .ConfigureServices(svc =>
                 {
                     svc.AddDbContextPool<CrmsContext>(options =>
@@ -46,9 +54,12 @@ namespace Xmu.Crms.Silo
                         .AddInsomniaTopicService()
                         .AddInsomniaUserService();
                 })
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(HighGradeExtensions).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(ViceVersaExtensions).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(InsomniaExtensions).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts =>
+                    parts.AddApplicationPart(typeof(HighGradeExtensions).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts =>
+                    parts.AddApplicationPart(typeof(ViceVersaExtensions).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts =>
+                    parts.AddApplicationPart(typeof(InsomniaExtensions).Assembly).WithReferences())
                 .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Warning).AddConsole())
                 .Build();
 
@@ -75,6 +86,63 @@ namespace Xmu.Crms.Silo
             Console.WriteLine("Silo stopped");
             _SiloStopped.Set();
         }
+
+        public static IPAddress GetLocalIpAddress()
+        {
+            UnicastIPAddressInformation mostSuitableIp = null;
+
+            var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+
+            foreach (var network in networkInterfaces)
+            {
+                if (network.OperationalStatus != OperationalStatus.Up)
+                {
+                    continue;
+                }
+
+                var properties = network.GetIPProperties();
+
+                if (properties.GatewayAddresses.Count == 0)
+                {
+                    continue;
+                }
+
+                foreach (var address in properties.UnicastAddresses)
+                {
+                    if (address.Address.AddressFamily != AddressFamily.InterNetwork)
+                    {
+                        continue;
+                    }
+
+                    if (IPAddress.IsLoopback(address.Address))
+                    {
+                        continue;
+                    }
+
+                    if (!address.IsDnsEligible)
+                    {
+                        if (mostSuitableIp == null)
+                        {
+                            mostSuitableIp = address;
+                        }
+
+                        continue;
+                    }
+
+                    // The best IP is the IP got from DHCP server
+                    if (address.PrefixOrigin == PrefixOrigin.Dhcp)
+                    {
+                        return address.Address;
+                    }
+
+                    if (mostSuitableIp == null || !mostSuitableIp.IsDnsEligible)
+                    {
+                        mostSuitableIp = address;
+                    }
+                }
+            }
+
+            return mostSuitableIp?.Address;
+        }
     }
 }
-

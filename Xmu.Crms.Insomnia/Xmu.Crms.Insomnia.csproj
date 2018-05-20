@@ -13,8 +13,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Transport.Libuv" Version="2.0.3" />
     <PackageReference Include="Microsoft.Orleans.Client" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="2.0.0" />
     <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.3" />
     <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Orleans.OrleansProviders" Version="2.0.0" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.2" />
   </ItemGroup>

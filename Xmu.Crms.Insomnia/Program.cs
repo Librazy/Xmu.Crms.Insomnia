@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Configuration;
+using Orleans.Hosting;
 using Xmu.Crms.Shared;
 using Xmu.Crms.Shared.Service;
 
@@ -37,11 +38,15 @@ namespace Xmu.Crms.Insomnia
         private static IClusterClient CreateClusterClient(IServiceProvider serviceProvider)
         {
             var client = new ClientBuilder()
-                .UseLocalhostClustering(30000, "silo-insomnia", "insomnia")
+                .UseAdoNetClustering(options =>
+                {
+                    options.Invariant = "MySql.Data.MySqlClient";
+                    options.ConnectionString = "Server=localhost;Database=crmsdb;Uid=root;Pwd=root;SslMode=none";
+                })
                 .Configure<ClusterOptions>(options =>
                 {
-                    options.ClusterId = "silo-insomnia";
-                    options.ServiceId = "insomnia";
+                    options.ClusterId = "xmu.crms.silo";
+                    options.ServiceId = "xmu.crms.silo.services";
                 })
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(IUserService).Assembly))
                 .Build();

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Xmu.Crms.Silo": {
+      "commandName": "Project",
+      "workingDirectory": "."
+    }
+  }
+}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -6,6 +7,7 @@ using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Orleans;
@@ -19,6 +21,12 @@ namespace Xmu.Crms.Silo
     {
         private static ISiloHost _silo;
         private static readonly ManualResetEvent _SiloStopped = new ManualResetEvent(false);
+        private static readonly IConfiguration _Configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", false, true)
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true)
+            .AddEnvironmentVariables()
+            .Build();
 
         private static void Main()
         {
@@ -26,7 +34,7 @@ namespace Xmu.Crms.Silo
                 .UseAdoNetClustering(options =>
                 {
                     options.Invariant = "MySql.Data.MySqlClient";
-                    options.ConnectionString = "Server=localhost;Database=crmsdb;Uid=root;Pwd=root;SslMode=none";
+                    options.ConnectionString = _Configuration.GetConnectionString("MYSQL57");
                 })
                 .Configure<ClusterOptions>(options =>
                 {
@@ -37,7 +45,7 @@ namespace Xmu.Crms.Silo
                 .ConfigureServices(svc =>
                 {
                     svc.AddDbContextPool<CrmsContext>(options =>
-                        options.UseMySQL("Server=localhost;Database=crmsdb;Uid=root;Pwd=root;SslMode=none")
+                        options.UseMySQL(_Configuration.GetConnectionString("MYSQL57"))
                     );
                     svc
                         .AddViceVersaClassDao()

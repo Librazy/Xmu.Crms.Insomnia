@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Configuration;
@@ -37,11 +38,12 @@ namespace Xmu.Crms.Insomnia
 
         private static IClusterClient CreateClusterClient(IServiceProvider serviceProvider)
         {
+            IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var client = new ClientBuilder()
                 .UseAdoNetClustering(options =>
                 {
                     options.Invariant = "MySql.Data.MySqlClient";
-                    options.ConnectionString = "Server=localhost;Database=crmsdb;Uid=root;Pwd=root;SslMode=none";
+                    options.ConnectionString = configuration.GetConnectionString("MYSQL57");
                 })
                 .Configure<ClusterOptions>(options =>
                 {
